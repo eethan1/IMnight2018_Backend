@@ -155,6 +155,9 @@ USE_L10N = True
 
 USE_TZ = True
 
+STATIC_URL = '/static/IMnight/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 # django REST framework
 # http://www.django-rest-framework.org
 
