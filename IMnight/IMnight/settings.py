@@ -155,8 +155,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATIC_URL = '/static/IMnight/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # django REST framework
 # http://www.django-rest-framework.org
@@ -178,7 +176,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/static/IMnight/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Channel for chat
 # https://blog.heroku.com/in_deep_with_django_channels_the_future_of_real_time_apps_in_django
