@@ -25,7 +25,7 @@ SECRET_KEY = 'ti#_4flcu1o_%!)rxqvujigi5=1=kl!9k9f(m^r1-+q8m+v*ub'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['140.112.106.45', 'ntu.im', 'imnight2018.ntu.im']
 
 
 # Application definition
