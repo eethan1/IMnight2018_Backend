@@ -31,4 +31,5 @@ urlpatterns = [
     url(r'^human/', include('human.urls')),
     url(r'^earth/', include('earth.urls')),
     url(r'^lottery/', include('lottery.urls')),
+    url(r'^sky/', include('sky.urls')),
 ]
