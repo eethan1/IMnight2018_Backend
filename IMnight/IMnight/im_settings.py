@@ -20,7 +20,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 
 # Allow all host headers.
-ALLOWED_HOSTS = ['140.112.106.45', 'ntu.im']
+ALLOWED_HOSTS = ['140.112.106.45', 'ntu.im', 'imnight2018.ntu.im']
 
 # Turn off DEBUG mode.
 #DEBUG = False
