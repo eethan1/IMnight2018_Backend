@@ -104,6 +104,8 @@ WSGI_APPLICATION = 'IMnight.wsgi.application'
 
 LOGIN_REDIRECT_URL = ''
 
+ACCOUNT_ADAPTER = 'IMnight.accounts.social.adapter.MyAccountAdapter'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
