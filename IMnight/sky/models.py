@@ -24,6 +24,9 @@ class Course(models.Model):
     class Meta:
         verbose_name = "Course"
 
+    def __str__(self):
+        return '%s teacher:%s label:%s' % (self.name, self.teacher, self.label)
+
     def save(self, *args, **kwargs):
         hashkey = self.name + str(self.created)
         course_label =  hash(hashkey) % (10 ** 20)
@@ -55,6 +58,9 @@ class Article(models.Model):
     class Meta:
         verbose_name = "Article"
     
+    def __str__(self):
+        return '%s %s label:%s' % (self.title, ARTICLE_CATEGORY_CHOICE[self.category-1][1], self.label)
+
     def save(self, *args, **kwargs):
         hashkey = self.title + str(self.created)
         article_label =  hash(hashkey) % (10 ** 20)
