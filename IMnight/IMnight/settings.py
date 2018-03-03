@@ -25,8 +25,19 @@ SECRET_KEY = 'ti#_4flcu1o_%!)rxqvujigi5=1=kl!9k9f(m^r1-+q8m+v*ub'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# Allow all host headers.
+ALLOWED_HOSTS = ['140.112.106.45', 'ntu.im',
+                 'imnight2018.ntu.im', 'imnight2018backend.ntu.im']
 
+# CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ORIGIN_WHITELIST = (
+    'ntu.im/night/2018',
+)
+
+CSRF_TRUSTED_ORIGINS = (
+    'ntu.im/night/2018',
+)
 
 # Application definition
 
