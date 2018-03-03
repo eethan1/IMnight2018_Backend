@@ -29,6 +29,7 @@ class Profile(models.Model):
 
     def add_point(self, reward):
         self.point += reward
+        self.save()
         return self.point
 
 
