@@ -83,12 +83,10 @@ class ProgressTaskManager(models.Manager):
 
             if created:
                 user.profile.add_point(task.credit)
-                user.save()
                 return True
             else:
                 if obj.last_active_date.date() != datetime.datetime.today().date():
                     user.profile.add_point(task.credit)
-                    user.save()
                     obj.last_active_date = datetime.datetime.today()
                     obj.save()
                     return True
