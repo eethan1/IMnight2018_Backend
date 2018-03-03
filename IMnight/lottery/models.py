@@ -89,6 +89,8 @@ class ProgressTaskManager(models.Manager):
                         user.add_point(test.credit)
                         obj.last_active_date = timezone.now
                         finished_task.append(obj)
+                    else:
+                        return ProgressTask.objects.none()
 
             if len(tasks) > 1 or len(finished_task):
                 testlog.warning(
