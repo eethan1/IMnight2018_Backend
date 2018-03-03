@@ -5,28 +5,77 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
-from sky.models import Article, News
-from sky.serializers import NewsSerializer, ArticleSerializer
+from sky.models import Article, News, Course
+from sky.serializers import NewsSerializer, ArticleSerializer, CourseSerializer
+
+QUERY_MAX = 10
+
+class CourseListView(ListAPIView):
+    """
+    取得課程
+    default_para = {'start_index':'0', 'num':'5', 'label':None}
+    """
+    # permission_classes = (IsAuthenticated,)
+    serializer_class = CourseSerializer
+
+    default_para = {'start_index':'0', 'num':'5', 'label':None}
+    para_key = ('start_index', 'num', 'label')
+    def get_queryset(self):
+        q ={}
+        for key in self.para_key:
+            q[key] = self.request.query_params.get(key, self.default_para[key])
+        queryset = Course.objects.all()
+        if int(q['num']) > QUERY_MAX:
+            q['num'] = QUERY_MAX
+        if q['label'] is not None:
+            queryset = queryset.filter(label=q['label'])
+        queryset = queryset.order_by('-created')[int(q['start_index']):int(q['start_index'])+int(q['num'])]
+        return queryset
+
+class ArticleListView(ListAPIView):
+    """
+    取得文章
+    default_para = {'start_index':'0', 'num':'5', 'label':None}
+    """
+    # permission_classes = (IsAuthenticated,)
+    serializer_class = ArticleSerializer
+    default_para = {'start_index':'0', 'num':'5', 'label':None}
+    para_key = ('start_index', 'num', 'label')
+    def get_queryset(self):
+        q ={}
+        for key in self.para_key:
+            q[key] = self.request.query_params.get(key, self.default_para[key])
+        queryset = Article.objects.all()
+        if int(q['num']) > QUERY_MAX:
+            q['num'] = QUERY_MAX
+        if q['label'] is not None:
+            queryset = queryset.filter(label=q['label'])
+        queryset = queryset.order_by('-created')[int(q['start_index']):int(q['start_index'])+int(q['num'])]
+        return queryset
+
 
 
 class NewsListView(ListAPIView):
     """
-    取得用戶自己以抽過的performer
+    取得News
+    default_para = {'start_index':'0', 'num':'5', 'label':None}
     """
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     serializer_class = NewsSerializer
-
+    
+    default_para = {'start_index':'0', 'num':'5', 'label':None}
+    para_key = ('start_index', 'num', 'label')
     def get_queryset(self):
-        queryset = News.objects.all().order_by('-created')[:5]
+        q ={}
+        for key in self.para_key:
+            q[key] = self.request.query_params.get(key, self.default_para[key])
+        queryset = News.objects.all()
+        if int(q['num']) > QUERY_MAX:
+            q['num'] = QUERY_MAX
+        if q['label'] is not None:
+            queryset = queryset.filter(label=q['label'])
+        queryset = queryset.order_by('-created')[int(q['start_index']):int(q['start_index'])+int(q['num'])]
         return queryset
 
 
-class CreateNewsView(CreateAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = NewsSerializer
 
-    # def create(request, *args, **kwargs):
-    #     if request.user.groups.filter(name='Admin').exists():
-    #         super(CreateNewsView, self).create(request, *args, **kwargs)
-    #     else:
-    #         raise

@@ -23,7 +23,7 @@ TASK_CATEGORY_CHOICE = (
 def is_task(task_label):
     tasks = Task.objects.filter(label=task_label)
 
-    if task:
+    if tasks:
         return True
     else:
         return False
@@ -39,8 +39,10 @@ class Task(models.Model):
         default=1, choices=TASK_CATEGORY_CHOICE)
     label = models.SlugField(unique=True)
 
+    objects = models.manager
     def __str__(self):
-        return "%s have %d credit, due in %s" % (self.name, self.credit, self.due_date)
+        return "%s %s have %d credit, due in %s, label:%s" % (self.name, TASK_CATEGORY_CHOICE[self.category-1][1]\
+        , self.credit, self.due_date, self.label)
 
     def save(self, *args, **kwargs):
         hashkey = self.name + str(self.due_date)
@@ -81,12 +83,12 @@ class ProgressTaskManager(models.Manager):
                     testlog.error(error)
 
                 if created:
-                    user.add_point(test.credit)
+                    user.add_point(task.credit)
                     finished_task.append(obj)
 
                 else:
                     if obj.last_active_date != datetime.date.today():
-                        user.add_point(test.credit)
+                        user.add_point(task.credit)
                         obj.last_active_date = timezone.now
                         finished_task.append(obj)
                     else:
