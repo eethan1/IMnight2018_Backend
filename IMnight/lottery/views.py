@@ -43,7 +43,7 @@ def finish_task(request):
         try:
             finished_task = ProgressTask.objects.finish_task_by_label(
                 request.user, request.data['label'])
-            if finished_task is not None:
+            if finished_task:
                 return Response({"message": "Task finished Succeesslly"}, status=status.HTTP_201_CREATED)
             else:
                 return Response({"message": "Task already finished or closed"}, status=status.HTTP_201_CREATED)

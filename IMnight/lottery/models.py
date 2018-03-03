@@ -72,7 +72,7 @@ class ProgressTaskManager(models.Manager):
     def finish_task_by_label(self, user, task_label):
         tasks = Task.objects.filter(label=task_label)
         finished_task = []
-        if tasks is not None:
+        if tasks:
             for task in tasks:
                 try:
                     obj, created = ProgressTask.objects.get_or_create(
@@ -89,6 +89,8 @@ class ProgressTaskManager(models.Manager):
                         user.add_point(test.credit)
                         obj.last_active_date = timezone.now
                         finished_task.append(obj)
+                    else:
+                        return False
 
             if len(tasks) > 1 or len(finished_task):
                 testlog.warning(
@@ -97,7 +99,7 @@ class ProgressTaskManager(models.Manager):
             raise Exception(
                 "this task label dosen't exist,  label=%s", task_label)
 
-        return finished_task
+        return True
 
 
 class ProgressTask(models.Model):
