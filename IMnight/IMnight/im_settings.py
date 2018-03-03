@@ -26,8 +26,9 @@ SECRET_KEY = 'ti#_4flcu1o_%!)rxqvujigi5=1=kl!9k9f(m^r1-+q8m+v*ub'
 DEBUG = True
 
 # Allow all host headers.
-ALLOWED_HOSTS = ['140.112.106.45', 'ntu.im',
+ALLOWED_HOSTS = ['127.0.0.1', '140.112.106.45', 'ntu.im',
                  'imnight2018.ntu.im', 'imnight2018backend.ntu.im']
+# ALLOWED_HOSTS = ['*']
 
 # CORS_ORIGIN_ALLOW_ALL = True
 
