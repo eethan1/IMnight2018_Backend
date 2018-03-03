@@ -106,6 +106,7 @@ class ProgressTask(models.Model):
     task = models.ForeignKey(
         Task, on_delete=models.CASCADE)
     last_active_date = models.DateTimeField(default=timezone.now)
+    is_finish = models.BooleanField(default=False)
 
     objects = ProgressTaskManager()
 
