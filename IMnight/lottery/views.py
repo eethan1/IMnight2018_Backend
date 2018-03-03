@@ -49,6 +49,7 @@ def finish_task(request):
                 return Response({"message": "Task already finished or closed"}, status=status.HTTP_201_CREATED)
 
         except Exception as error:
+            print (error)
             return Response({"message": "error"}, status=status.HTTP_400_BAD_REQUEST)
 
     else:

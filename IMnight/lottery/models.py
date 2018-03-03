@@ -72,36 +72,30 @@ class ProgressTaskManager(models.Manager):
             return ProgressTask.objects.filter(user=user)
 
     def finish_task_by_label(self, user, task_label):
-        tasks = Task.objects.filter(label=task_label)
-        finished_task = []
-        if tasks:
-            if len(tasks) > 1 or len(finished_task):
-                testlog.warning(
-                    "A task_label should only point to one task, label=%s", task_label)
-            for task in tasks:
-                try:
-                    obj, created = ProgressTask.objects.get_or_create(
-                        user=user, task=task)
-                except Exception as error:
-                    testlog.error(error)
+        task = Task.objects.filter(label=task_label).first()
+        if task:
+            try:
+                obj, created = ProgressTask.objects.get_or_create(
+                    user=user, task=task)
+                print(obj, created)
+            except Exception as error:
+                testlog.error(error)
 
-                if created:
+            if created:
+                user.profile.add_point(task.credit)
+                user.save()
+                return True
+            else:
+                if obj.last_active_date.date() != datetime.datetime.today().date():
                     user.profile.add_point(task.credit)
-                    finished_task.append(obj)
-
+                    user.save()
+                    obj.last_active_date = datetime.datetime.today()
+                    obj.save()
+                    return True
                 else:
-                    if obj.last_active_date != datetime.datetime.today().date():
-                        user.profile.add_point(task.credit)
-                        obj.last_active_date = datetime.datetime.today()
-                        finished_task.append(obj)
-                    else:
-                        return False
-
+                    return False
         else:
-            raise Exception(
-                "this task label dosen't exist,  label=%s", task_label)
-
-        return True
+            return False
 
 
 class ProgressTask(models.Model):
