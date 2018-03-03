@@ -104,7 +104,7 @@ WSGI_APPLICATION = 'IMnight.wsgi.application'
 
 LOGIN_REDIRECT_URL = ''
 
-ACCOUNT_ADAPTER = 'IMnight.accounts.social.adapter.MyAccountAdapter'
+ACCOUNT_ADAPTER = 'accounts.social.adapter.MyAccountAdapter'
 
 SOCIALACCOUNT_PROVIDERS = {
     'facebook': {
