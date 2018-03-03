@@ -4,7 +4,7 @@ from .settings import *
 STATIC_URL = '/static/IMnight/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_ALLOW_ALL = True
 #
 # CORS_ORIGIN_WHITELIST = (
 #     'ntu.im/night/2018',
@@ -13,6 +13,13 @@ CORS_ORIGIN_ALLOW_ALL = True
 # CSRF_TRUSTED_ORIGINS = (
 #     'ntu.im/night/2018',
 # )
+
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = (
+    # Here was the problem indeed and it has to be http://localhost:3000, not http://localhost:3000/
+    'http://localhost:80'
+)
 
 
 # Allow all host headers.
