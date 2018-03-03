@@ -1579,3 +1579,4 @@ Traceback (most recent call last):
   File "/home/eethan1/Desktop/IMnight2018_Backend/IMnight/lottery/models.py", line 44, in __str__
     return "%s %s have %d credit, due in %s, label:%s" % (self.name, TASK_CATEGORY_CHOICE[self.category][1]\
 IndexError: tuple index out of range
+WARNING - [2018-03-03 00:20:49] (base 2354 140302421587712) Not Found: /favicon.ico

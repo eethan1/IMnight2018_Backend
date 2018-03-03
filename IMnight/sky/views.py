@@ -78,12 +78,4 @@ class NewsListView(ListAPIView):
         return queryset
 
 
-class CreateNewsView(CreateAPIView):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = NewsSerializer
 
-    # def create(request, *args, **kwargs):
-    #     if request.user.groups.filter(name='Admin').exists():
-    #         super(CreateNewsView, self).create(request, *args, **kwargs)
-    #     else:
-    #         raise
