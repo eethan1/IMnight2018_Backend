@@ -10,7 +10,7 @@ from rest_framework import status
 
 
 from earth.models import HoldingVocher, Store, Vocher
-from earth.serializers import HoldingVocherSerializer, VocherSerializer, UseVocherSerializer
+from earth.serializers import HoldingVocherSerializer, VocherSerializer, UseVocherSerializer, StoreSerializer
 
 
 @api_view(['POST'])
@@ -57,4 +57,28 @@ class StoreVocherView(ListAPIView):
             queryset = HoldingVocher.objects.get_vochers(user, storename)
         else:
             queryset = HoldingVocher.objects.get_vochers(user)
+        return queryset
+
+
+class ListVocherView(ListAPIView):
+    """
+    取得所有的vocher
+    """
+    permission_classes = (AllowAny,)
+    serializer_class = VocherSerializer
+
+    def get_queryset(self):
+        queryset = Vocher.objects.all()
+        return queryset
+
+
+class ListStoreView(ListAPIView):
+    """
+    取得所有的store
+    """
+    permission_classes = (AllowAny,)
+    serializer_class = StoreSerializer
+
+    def get_queryset(self):
+        queryset = Store.objects.all()
         return queryset
