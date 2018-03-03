@@ -81,12 +81,12 @@ class ProgressTaskManager(models.Manager):
                     testlog.error(error)
 
                 if created:
-                    user.add_point(test.credit)
+                    user.add_point(task.credit)
                     finished_task.append(obj)
 
                 else:
                     if obj.last_active_date != datetime.date.today():
-                        user.add_point(test.credit)
+                        user.add_point(task.credit)
                         obj.last_active_date = timezone.now
                         finished_task.append(obj)
                     else:
