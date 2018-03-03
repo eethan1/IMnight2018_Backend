@@ -49,7 +49,7 @@ def finish_task(request):
                 return Response({"message": "Task already finished or closed"}, status=status.HTTP_201_CREATED)
 
         except Exception as error:
-            return Response({"message": error}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "error"}, status=status.HTTP_400_BAD_REQUEST)
 
     else:
         return Response({"message": "parameter \'label\' not in scoope"}, status=status.HTTP_400_BAD_REQUEST)

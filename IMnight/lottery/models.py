@@ -40,9 +40,9 @@ class Task(models.Model):
     label = models.SlugField(unique=True)
 
     objects = models.manager
+
     def __str__(self):
-        return "%s %s have %d credit, due in %s, label:%s" % (self.name, TASK_CATEGORY_CHOICE[self.category-1][1]\
-        , self.credit, self.due_date, self.label)
+        return "%s %s have %d credit, due in %s, label:%s" % (self.name, TASK_CATEGORY_CHOICE[self.category - 1][1], self.credit, self.due_date, self.label)
 
     def save(self, *args, **kwargs):
         hashkey = self.name + str(self.due_date)
@@ -75,6 +75,9 @@ class ProgressTaskManager(models.Manager):
         tasks = Task.objects.filter(label=task_label)
         finished_task = []
         if tasks:
+            if len(tasks) > 1 or len(finished_task):
+                testlog.warning(
+                    "A task_label should only point to one task, label=%s", task_label)
             for task in tasks:
                 try:
                     obj, created = ProgressTask.objects.get_or_create(
@@ -83,20 +86,17 @@ class ProgressTaskManager(models.Manager):
                     testlog.error(error)
 
                 if created:
-                    user.add_point(task.credit)
+                    user.profile.add_point(task.credit)
                     finished_task.append(obj)
 
                 else:
-                    if obj.last_active_date != datetime.date.today():
-                        user.add_point(task.credit)
-                        obj.last_active_date = timezone.now
+                    if obj.last_active_date != datetime.datetime.today().date():
+                        user.profile.add_point(task.credit)
+                        obj.last_active_date = datetime.datetime.today()
                         finished_task.append(obj)
                     else:
                         return False
 
-            if len(tasks) > 1 or len(finished_task):
-                testlog.warning(
-                    "A task_label should only point to one task, label=%s", task_label)
         else:
             raise Exception(
                 "this task label dosen't exist,  label=%s", task_label)
@@ -110,7 +110,7 @@ class ProgressTask(models.Model):
     task = models.ForeignKey(
         Task, on_delete=models.CASCADE)
     last_active_date = models.DateTimeField(default=timezone.now)
-    is_finish = models.BooleanField(default=False)
+    # is_finish = models.BooleanField(default=False)
 
     objects = ProgressTaskManager()
 
