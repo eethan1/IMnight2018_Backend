@@ -18,7 +18,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 
 # Allow all host headers.
-ALLOWED_HOSTS = ['140.112.106.45', 'ntu.im',
+ALLOWED_HOSTS = ['127.0.0.1', '140.112.106.45', 'ntu.im',
                  'imnight2018.ntu.im', 'imnight2018backend.ntu.im']
 
 # Turn off DEBUG mode.
