@@ -17,6 +17,9 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework_swagger.views import get_swagger_view
 
+from accounts.social.views import FacebookLogin
+
+from allauth.socialaccount.views import ConnectionsView
 
 schema_view = get_swagger_view(title='API Endpoint')
 
@@ -29,6 +32,8 @@ urlpatterns = [
 
     url(r'^accounts/', include('accounts.urls')),
     url(r'^allauth/', include('allauth.urls')),
+    url(r'^rest_auth/', include('rest_auth.urls')),
+    url(r'^rest_auth/facebook//$', FacebookLogin.as_view(), name='fb_login'),
 
     url(r'^human/', include('human.urls')),
     url(r'^earth/', include('earth.urls')),
