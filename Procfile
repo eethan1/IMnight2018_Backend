@@ -1,1 +1,1 @@
-gunicorn --chdir IMnight IMnight.wsgi
+web: gunicorn --chdir IMnight IMnight.wsgi
