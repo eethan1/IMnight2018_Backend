@@ -13,13 +13,13 @@ QUERY_MAX = 10
 class CourseListView(ListAPIView):
     """
     取得課程
-    default_para = {'start_index':'0', 'num':'5', 'label':None}
+    default_para = {'index':'0', 'num':'5', 'label':None}
     """
     # permission_classes = (IsAuthenticated,)
     serializer_class = CourseSerializer
 
-    default_para = {'start_index':'0', 'num':'5', 'label':None}
-    para_key = ('start_index', 'num', 'label')
+    default_para = {'index':'0', 'num':'5', 'label':None}
+    para_key = ('index', 'num', 'label')
     def get_queryset(self):
         q ={}
         for key in self.para_key:
@@ -29,18 +29,18 @@ class CourseListView(ListAPIView):
             q['num'] = QUERY_MAX
         if q['label'] is not None:
             queryset = queryset.filter(label=q['label'])
-        queryset = queryset.order_by('-created')[int(q['start_index']):int(q['start_index'])+int(q['num'])]
+        queryset = queryset.order_by('-created')[int(q['index']):int(q['index'])+int(q['num'])]
         return queryset
 
 class ArticleListView(ListAPIView):
     """
     取得文章
-    default_para = {'start_index':'0', 'num':'5', 'label':None}
+    default_para = {'index':'0', 'num':'5', 'label':None}
     """
     # permission_classes = (IsAuthenticated,)
     serializer_class = ArticleSerializer
-    default_para = {'start_index':'0', 'num':'5', 'label':None}
-    para_key = ('start_index', 'num', 'label')
+    default_para = {'index':'0', 'num':'5', 'label':None}
+    para_key = ('index', 'num', 'label')
     def get_queryset(self):
         q ={}
         for key in self.para_key:
@@ -50,7 +50,7 @@ class ArticleListView(ListAPIView):
             q['num'] = QUERY_MAX
         if q['label'] is not None:
             queryset = queryset.filter(label=q['label'])
-        queryset = queryset.order_by('-created')[int(q['start_index']):int(q['start_index'])+int(q['num'])]
+        queryset = queryset.order_by('-created')[int(q['index']):int(q['index'])+int(q['num'])]
         return queryset
 
 
@@ -58,13 +58,13 @@ class ArticleListView(ListAPIView):
 class NewsListView(ListAPIView):
     """
     取得News
-    default_para = {'start_index':'0', 'num':'5', 'label':None}
+    default_para = {'index':'0', 'num':'5', 'label':None}
     """
     # permission_classes = (IsAuthenticated,)
     serializer_class = NewsSerializer
     
-    default_para = {'start_index':'0', 'num':'5', 'label':None}
-    para_key = ('start_index', 'num', 'label')
+    default_para = {'index':'0', 'num':'5', 'label':None}
+    para_key = ('index', 'num', 'label')
     def get_queryset(self):
         q ={}
         for key in self.para_key:
@@ -74,7 +74,7 @@ class NewsListView(ListAPIView):
             q['num'] = QUERY_MAX
         if q['label'] is not None:
             queryset = queryset.filter(label=q['label'])
-        queryset = queryset.order_by('-created')[int(q['start_index']):int(q['start_index'])+int(q['num'])]
+        queryset = queryset.order_by('-created')[int(q['index']):int(q['index'])+int(q['num'])]
         return queryset
 
 
