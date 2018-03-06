@@ -26,12 +26,16 @@ urlpatterns = [
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
     url(r'^jet/dashboard/', include('jet.dashboard.urls',
                                     'jet-dashboard')),  # Django JET dashboard URLS
-    # url(r'^accounts/', include('accounts.urls'), name='Authorization'),
-    # url(r'^accounts/registration/', include('accounts.registration.urls')),
-    url(r'^accounts/', include('allauth.urls')),
-    url(r'^accounts/social/', include('accounts.social.urls')),
+
+    url(r'^accounts/', include('accounts.urls')),
+    url(r'^allauth/', include('allauth.urls')),
+
     url(r'^human/', include('human.urls')),
     url(r'^earth/', include('earth.urls')),
     url(r'^lottery/', include('lottery.urls')),
     url(r'^sky/', include('sky.urls')),
 ]
+
+
+# url(r'^accounts/registration/', include('accounts.registration.urls')),
+# url(r'^accounts/social/', include('accounts.social.urls')),
