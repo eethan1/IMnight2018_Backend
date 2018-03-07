@@ -12,6 +12,14 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ArticleListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Article
+
+        fields = ('id', 'title', 'label', 'img')
+
+
 class ArticleSerializer(serializers.ModelSerializer):
     task = TaskSerializer(required=True)
 
