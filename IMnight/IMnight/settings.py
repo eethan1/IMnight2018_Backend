@@ -148,7 +148,7 @@ SOCIALACCOUNT_PROVIDERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'imnight_backend',
+        'NAME': 'hotfix',
         'USER': 'django',
         'PASSWORD': 'bnjaAKWULde^22=9$!fq',
         'HOST': '140.112.106.45',
