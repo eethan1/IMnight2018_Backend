@@ -3,6 +3,7 @@ from django.shortcuts import render
 from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView, ListAPIView, CreateAPIView
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.response import Response
 
 from sky.models import Article, News, Course
@@ -16,7 +17,8 @@ class CourseListView(ListAPIView):
     取得課程
     default_para = {'index':'0', 'num':'5', 'label':None}
     """
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
     serializer_class = CourseListSerializer
 
     default_para = {'index': '0', 'num': '5', 'label': None}
@@ -37,6 +39,8 @@ class CourseListView(ListAPIView):
 
 
 class CourseView(ListAPIView):
+    permission_classes = (AllowAny,)
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
     serializer_class = CourseSerializer
 
     def get_queryset(self):
@@ -57,7 +61,8 @@ class ArticleListView(ListAPIView):
     取得文章
     default_para = {'index':'0', 'num':'5', 'label':None}
     """
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
     serializer_class = ArticleListSerializer
     default_para = {'index': '0', 'num': '5', 'label': None}
     para_key = ('index', 'num', 'label')
@@ -77,6 +82,8 @@ class ArticleListView(ListAPIView):
 
 
 class ArticleView(ListAPIView):
+    permission_classes = (AllowAny,)
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
     serializer_class = ArticleSerializer
 
     def get_queryset(self):
@@ -97,7 +104,8 @@ class NewsListView(ListAPIView):
     取得News
     default_para = {'index':'0', 'num':'5', 'label':None}
     """
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
     serializer_class = NewsSerializer
 
     default_para = {'index': '0', 'num': '5', 'label': None}

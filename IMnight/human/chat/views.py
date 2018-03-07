@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 
 from human.models import Relationship
 from human.chat.serializers import MessageSerializer
@@ -10,6 +11,7 @@ from human.chat.serializers import MessageSerializer
 
 class ChatView(ListAPIView):
     permission_classes = (IsAuthenticated, )
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
     serializer_class = MessageSerializer
 
     def get_queryset(self):

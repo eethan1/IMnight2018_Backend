@@ -4,7 +4,8 @@ from __future__ import unicode_literals
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -15,6 +16,7 @@ from earth.serializers import HoldingVocherSerializer, VocherSerializer, UseVoch
 
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
+@authentication_classes((SessionAuthentication, BasicAuthentication))
 def use_vocher(request):
     if ('label' in request.data):
         if HoldingVocher.objects.used_vocher(request.user, request.data['label']):
@@ -30,6 +32,7 @@ class DailyVocherView(ListAPIView):
     取得當日的daily vocher
     """
     permission_classes = (IsAuthenticated, )
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
     serializer_class = HoldingVocherSerializer
 
     def get_queryset(self):
@@ -44,6 +47,7 @@ class StoreVocherView(ListAPIView):
     取得用戶的Vocher
     """
     permission_classes = (IsAuthenticated,)
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
     serializer_class = HoldingVocherSerializer
 
     def get_queryset(self):
@@ -65,6 +69,7 @@ class ListVocherView(ListAPIView):
     取得所有的vocher
     """
     permission_classes = (AllowAny,)
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
     serializer_class = VocherSerializer
 
     def get_queryset(self):
@@ -77,6 +82,7 @@ class ListStoreView(ListAPIView):
     取得所有的store
     """
     permission_classes = (AllowAny,)
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
     serializer_class = StoreSerializer
 
     def get_queryset(self):

@@ -5,7 +5,8 @@ from rest_framework import status
 from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView, ListAPIView
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.decorators import api_view
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -18,6 +19,7 @@ testlog = logging.getLogger('testdevelop')
 
 class ProgressTaskView(ListAPIView):
     permission_classes = (IsAuthenticated, )
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
     serializer_class = ProgressTaskSerializer
 
     def get_queryset(self):
@@ -38,6 +40,8 @@ class ProgressTaskView(ListAPIView):
 
 
 @api_view(['POST'])
+@authentication_classes((SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
 def finish_task(request):
     if ('label' in request.data):
         try:
