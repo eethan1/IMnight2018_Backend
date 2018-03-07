@@ -4,6 +4,14 @@ from sky.models import Article, News, Course
 from lottery.serializers import TaskSerializer
 
 
+class CourseListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Course
+
+        fields = ('id', 'name', 'teacher', 'label', 'img')
+
+
 class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
