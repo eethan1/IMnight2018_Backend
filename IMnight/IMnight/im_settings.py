@@ -16,6 +16,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_CREDENTIALS = True
 
+CORS_REPLACE_HTTPS_REFERER = True
+
 
 # Allow all host headers.
 ALLOWED_HOSTS = ['127.0.0.1', '140.112.106.45', 'ntu.im',
