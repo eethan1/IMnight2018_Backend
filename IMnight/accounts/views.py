@@ -19,11 +19,6 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework import status
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 
-from accounts.serializers import (
-    TokenSerializer, UserDetailsSerializer, LoginSerializer,
-    PasswordResetSerializer, PasswordResetConfirmSerializer,
-    PasswordChangeSerializer, JWTSerializer
-)
 
 from human.models import Relationship
 from earth.models import HoldingVocher
