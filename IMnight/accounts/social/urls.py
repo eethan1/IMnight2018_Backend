@@ -8,7 +8,7 @@ from allauth.socialaccount import providers
 
 urlpatterns = [
     # url(r'^facebook/token$', FacebookLogin.as_view(), name='fb_login'),
-    url(r'^facebook/button$', facebookButton),
+    # url(r'^facebook/button$', facebookButton),
 ]
 
 # for provider in providers.registry.get_list():
