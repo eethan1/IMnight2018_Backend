@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from sky.models import Article, News, Course
+from lottery.serializers import TaskSerializer
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -10,13 +11,15 @@ class CourseSerializer(serializers.ModelSerializer):
 
         fields = '__all__'
 
+
 class ArticleSerializer(serializers.ModelSerializer):
+    task = TaskSerializer(required=True)
 
     class Meta:
         model = Article
 
         fields = '__all__'
-        
+
 
 class NewsSerializer(serializers.ModelSerializer):
 

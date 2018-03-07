@@ -16,7 +16,8 @@ testlog = logging.getLogger('testdevelop')
 TASK_CATEGORY_CHOICE = (
     (1, "每日任務"),
     (2, "限時任務"),
-    (3, "彩蛋")
+    (3, "彩蛋"),
+    (4, "閱讀文章")
 )
 
 
