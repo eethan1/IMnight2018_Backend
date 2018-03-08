@@ -27,7 +27,7 @@ def use_vocher(request):
         return Response({"message": "parameter \'label\' not in scoope"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class DailyVocherView(RetrieveAPIView):
+class DailyVocherView(ListAPIView):
     """
     取得當日的daily vocher
     """
@@ -39,10 +39,7 @@ class DailyVocherView(RetrieveAPIView):
         user = self.request.user
 
         queryset = HoldingVocher.objects.get_daily(user)
-        if queryset:
-            return queryset
-        else:
-            return Response({"auth_status": False})
+        return queryset
 
 
 class StoreVocherView(ListAPIView):

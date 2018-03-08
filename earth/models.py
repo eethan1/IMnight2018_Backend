@@ -49,7 +49,7 @@ class HoldingVocherManager(models.Manager):
             return HoldingVocher.objects.none()
 
         if daily_vocher:
-            return daily_vocher
+            return [daily_vocher]
         else:
             for holdingVocher in own_HoldingVocher:
                 own_vocher_pk.append(holdingVocher.vocher.pk)
@@ -91,7 +91,7 @@ class HoldingVocherManager(models.Manager):
                     testlog.warning(error)
                     return HoldingVocher.objects.none()
                 else:
-                    return daily_vocher
+                    return [daily_vocher]
 
     def check_daily(self, user):
         try:
