@@ -7,7 +7,10 @@ from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView, ListA
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.schemas import AutoSchema
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.response import Response
 import coreapi
 
 from human.models import Relationship
@@ -25,6 +28,7 @@ class SelfDetailsView(RetrieveUpdateAPIView):
     """
     serializer_class = UserDetailsSerializer
     permission_classes = (IsAuthenticated,)
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
 
     def get_object(self):
         return self.request.user
@@ -44,6 +48,7 @@ class UserDetailsView(ListAPIView):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = UserDetailsSerializer
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
 
     def get_queryset(self):
         """
@@ -63,6 +68,7 @@ class RelationshipDetailsView(ListAPIView):
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = RelationshipSerializer
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
 
     def get_queryset(self):
         user = self.request.user
@@ -84,6 +90,7 @@ class DailyPerformerView(ListAPIView):
     """
     permission_classes = (IsAuthenticated, )
     serializer_class = RelationshipSerializer
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
 
     def get_queryset(self):
         user = self.request.user

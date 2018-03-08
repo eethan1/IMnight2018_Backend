@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+
+    'corsheaders',
+
     # django REST framework
     # http://www.django-rest-framework.org
     'rest_framework',
@@ -53,6 +56,9 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
 
+    'rest_auth',
+    'rest_auth.registration',
+
     'allauth.socialaccount',
     'allauth.socialaccount.providers.facebook',
 
@@ -60,6 +66,7 @@ INSTALLED_APPS = [
     'accounts',
     'human',
     'earth',
+    'sky',
     'lottery',
 ]
 
@@ -67,12 +74,17 @@ SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsPostCsrfMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'IMnight.urls'
@@ -95,20 +107,53 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'IMnight.wsgi.application'
 
+LOGIN_REDIRECT_URL = '/'
 
-# Database
+ACCOUNT_ADAPTER = 'accounts.social.adapter.MyAccountAdapter'
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
+SOCIALACCOUNT_ADAPTER = 'accounts.social.adapter.MySocialAccountAdapter'
+
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+
+AUTHENTICATION_BACKENDS = (
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+SOCIALACCOUNT_PROVIDERS = {
+    'facebook': {
+        'METHOD': 'oauth2',
+        'SCOPE': ['email', 'public_profile', 'user_friends'],
+        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
+        'INIT_PARAMS': {'cookie': True},
+        'FIELDS': [
+            'id',
+            'email',
+            'name',
+            'first_name',
+            'last_name',
+            'verified',
+            'locale',
+            'timezone',
+            'link',
+            'gender',
+            'updated_time',
+        ],
+        'EXCHANGE_TOKEN': True,
+        'LOCALE_FUNC': lambda request: 'en_US',
+        'VERIFIED_EMAIL': False,
+        'VERSION': 'v2.5',
+    }
+}
+
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'imnight_backend',
+        'NAME': 'hotfix',
         'USER': 'django',
         'PASSWORD': 'bnjaAKWULde^22=9$!fq',
         'HOST': '140.112.106.45',
@@ -148,12 +193,22 @@ USE_L10N = True
 
 USE_TZ = True
 
+
 # django REST framework
 # http://www.django-rest-framework.org
 
 REST_FRAMEWORK = {
-
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+    )
 }
+
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_UNIQUE_EMAIL = False
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # TLS Port
@@ -168,7 +223,9 @@ EMAIL_HOST = 'smtp.gmail.com'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/static/IMnight/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Channel for chat
 # https://blog.heroku.com/in_deep_with_django_channels_the_future_of_real_time_apps_in_django
@@ -178,7 +235,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "asgi_redis.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
+            "hosts": [os.environ.get('REDIS_URL', 'redis://140.112.106.45:6379')],
         },
         "ROUTING": "human.chat.routing.channel_routing",
     },
@@ -206,45 +263,10 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
-        'development_logfile': {
-            'level': 'DEBUG',
-            'filters': ['require_debug_true'],
-            'class': 'logging.FileHandler',
-            'filename': 'tmp/django_dev.log',
-            'formatter': 'verbose'
-        },
-        'production_logfile': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'tmp/django_production.log',
-            'maxBytes': 1024 * 1024 * 100,  # 100MB
-            'backupCount': 5,
-            'formatter': 'simple'
-        },
-        'dba_logfile': {
-            'level': 'DEBUG',
-            'filters': ['require_debug_false', 'require_debug_true'],
-            'class': 'logging.handlers.WatchedFileHandler',
-            'filename': 'tmp/django_dba.log',
-            'formatter': 'simple'
-        },
     },
     'loggers': {
         'testdevelop': {
             'handlers': ['console', ],
-        },
-        'coffeehouse': {
-            'handlers': ['development_logfile', 'production_logfile'],
-        },
-        'dba': {
-            'handlers': ['dba_logfile'],
-        },
-        'django': {
-            'handlers': ['development_logfile', 'production_logfile'],
-        },
-        'py.warnings': {
-            'handlers': ['development_logfile'],
         },
     },
     'filters': {

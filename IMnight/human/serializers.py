@@ -8,7 +8,7 @@ from human.models import Profile, Relationship
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ('bio', 'birth_date')
+        fields = ('nickname', 'job', 'img', 'bio', 'birth_date', 'point')
 
 
 class UserDetailsSerializer(serializers.ModelSerializer):
@@ -16,9 +16,8 @@ class UserDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('pk', 'username', 'email',
-                  'first_name', 'last_name', 'profile')
-        read_only_fields = ('email', )
+        fields = ('id', 'username', 'email', 'profile')
+        read_only_fields = ('email',)
 
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('profile')
@@ -30,19 +29,23 @@ class UserDetailsSerializer(serializers.ModelSerializer):
             'last_name', instance.last_name)
 
         # update Profile and User sametime
+        instance.profile.nickname = profile_data.get(
+            'nickname', instance.profile.nickname)
+        instance.profile.job = profile_data.get('job', instance.profile.job)
         instance.profile.bio = profile_data.get('bio', instance.profile.bio)
         instance.profile.birth_date = profile_data.get(
             'birth_date', instance.profile.birth_date)
+        instance.profile.img = profile_data.get('img', instance.profile.img)
 
         return instance
 
 
 class RelationshipSerializer(serializers.ModelSerializer):
-    client = UserDetailsSerializer(required=True)
+    # client = UserDetailsSerializer(required=True)
     performer = UserDetailsSerializer(required=True)
 
     class Meta:
         model = Relationship
 
-        fields = ('client', 'performer', 'created')
+        fields = ('performer', 'label', 'created')
         # fields = '__all__'

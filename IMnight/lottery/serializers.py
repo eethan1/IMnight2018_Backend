@@ -11,7 +11,6 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = '__all__'
-        read_only_fields = '__all__'
 
 
 class ProgressTaskSerializer(serializers.ModelSerializer):

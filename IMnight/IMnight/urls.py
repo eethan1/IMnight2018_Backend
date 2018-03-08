@@ -17,6 +17,10 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework_swagger.views import get_swagger_view
 
+from accounts.social.views import FacebookLogin
+
+from allauth.socialaccount.views import ConnectionsView
+
 schema_view = get_swagger_view(title='API Endpoint')
 
 urlpatterns = [
@@ -25,10 +29,18 @@ urlpatterns = [
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
     url(r'^jet/dashboard/', include('jet.dashboard.urls',
                                     'jet-dashboard')),  # Django JET dashboard URLS
-    url(r'^auth/', include('accounts.urls'), name='Authorization'),
-    url(r'^auth/registration/', include('accounts.registration.urls')),
-    url(r'^auth/social/', include('accounts.social.urls')),
+
+    url(r'^accounts/', include('accounts.urls')),
+    url(r'^allauth/', include('allauth.urls')),
+    url(r'^rest_auth/', include('rest_auth.urls')),
+    url(r'^rest_auth/facebook//$', FacebookLogin.as_view(), name='fb_login'),
+
     url(r'^human/', include('human.urls')),
     url(r'^earth/', include('earth.urls')),
     url(r'^lottery/', include('lottery.urls')),
+    url(r'^sky/', include('sky.urls')),
 ]
+
+
+# url(r'^accounts/registration/', include('accounts.registration.urls')),
+# url(r'^accounts/social/', include('accounts.social.urls')),

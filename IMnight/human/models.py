@@ -16,15 +16,20 @@ testlog = logging.getLogger('testdevelop')
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    nickname = models.TextField(max_length=50, blank=True)
+    job = models.TextField(max_length=500, blank=True)
     bio = models.TextField(max_length=500, blank=True)
     birth_date = models.DateField(null=True, blank=True)
     point = models.PositiveIntegerField(default=0, blank=False, null=False)
+    img = models.URLField(
+        default="https://scontent.fkhh1-1.fna.fbcdn.net/v/t1.0-9/10712978_745859095491727_8519447814807561759_n.jpg?oh=51a1b3c040bebb38f221053aeb2c42db&oe=5B16C07D")
 
     def __str__(self):
         return self.user.username
 
     def add_point(self, reward):
         self.point += reward
+        self.save()
         return self.point
 
 
@@ -43,7 +48,7 @@ def is_client(user):
     username = user.username
     user_instance = User.objects.filter(username=username).filter(
         groups__name__exact="Clients")
-    if user_instance is not None:
+    if user_instance:
         return True
     else:
         return False
@@ -53,7 +58,7 @@ def is_performer(user):
     username = user.username
     user_instance = User.objects.filter(username=username).filter(
         groups__name__exact="Performers")
-    if user_instance is not None:
+    if user_instance:
         return True
     else:
         return False
@@ -129,6 +134,18 @@ class RelationshipManager(models.Manager):
                     # return objects must be iterable
                     daily_performer = [daily_performer]
                     return daily_performer
+
+    def check_daily(self, user):
+        try:
+            daily_performer = Relationship.objects.filter(
+                client=user).filter(created__date=datetime.date.today())
+        except Exception as error:
+            testlog.error(error)
+            return False
+        if daily_performer:
+            return True
+        else:
+            return False
 
 
 class Relationship(models.Model):

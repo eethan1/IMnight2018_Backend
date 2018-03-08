@@ -16,14 +16,15 @@ testlog = logging.getLogger('testdevelop')
 TASK_CATEGORY_CHOICE = (
     (1, "每日任務"),
     (2, "限時任務"),
-    (3, "彩蛋")
+    (3, "彩蛋"),
+    (4, "閱讀文章")
 )
 
 
 def is_task(task_label):
     tasks = Task.objects.filter(label=task_label)
 
-    if task is not None:
+    if tasks:
         return True
     else:
         return False
@@ -39,8 +40,10 @@ class Task(models.Model):
         default=1, choices=TASK_CATEGORY_CHOICE)
     label = models.SlugField(unique=True)
 
+    objects = models.manager
+
     def __str__(self):
-        return "%s have %d credit, due in %s" % (self.name, self.credit, self.due_date)
+        return "%s %s have %d credit, due in %s, label:%s" % (self.name, TASK_CATEGORY_CHOICE[self.category - 1][1], self.credit, self.due_date, self.label)
 
     def save(self, *args, **kwargs):
         hashkey = self.name + str(self.due_date)
@@ -70,34 +73,28 @@ class ProgressTaskManager(models.Manager):
             return ProgressTask.objects.filter(user=user)
 
     def finish_task_by_label(self, user, task_label):
-        tasks = Task.objects.filter(label=task_label)
-        finished_task = []
-        if tasks is not None:
-            for task in tasks:
-                try:
-                    obj, created = ProgressTask.objects.get_or_create(
-                        user=user, task=task)
-                except Exception as error:
-                    testlog.error(error)
+        task = Task.objects.filter(label=task_label).first()
+        if task:
+            try:
+                obj, created = ProgressTask.objects.get_or_create(
+                    user=user, task=task)
+                print(obj, created)
+            except Exception as error:
+                testlog.error(error)
 
-                if created:
-                    user.add_point(test.credit)
-                    finished_task.append(obj)
-
+            if created:
+                user.profile.add_point(task.credit)
+                return True
+            else:
+                if obj.last_active_date.date() != datetime.datetime.today().date():
+                    user.profile.add_point(task.credit)
+                    obj.last_active_date = datetime.datetime.today()
+                    obj.save()
+                    return True
                 else:
-                    if obj.last_active_date != datetime.date.today():
-                        user.add_point(test.credit)
-                        obj.last_active_date = timezone.now
-                        finished_task.append(obj)
-
-            if len(tasks) > 1 or len(finished_task):
-                testlog.warning(
-                    "A task_label should only point to one task, label=%s", task_label)
+                    return False
         else:
-            raise Exception(
-                "this task label dosen't exist,  label=%s", task_label)
-
-        return finished_task
+            return False
 
 
 class ProgressTask(models.Model):
@@ -106,6 +103,7 @@ class ProgressTask(models.Model):
     task = models.ForeignKey(
         Task, on_delete=models.CASCADE)
     last_active_date = models.DateTimeField(default=timezone.now)
+    # is_finish = models.BooleanField(default=False)
 
     objects = ProgressTaskManager()
 

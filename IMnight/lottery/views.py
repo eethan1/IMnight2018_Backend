@@ -5,7 +5,8 @@ from rest_framework import status
 from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView, ListAPIView
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.decorators import api_view
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -18,6 +19,7 @@ testlog = logging.getLogger('testdevelop')
 
 class ProgressTaskView(ListAPIView):
     permission_classes = (IsAuthenticated, )
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
     serializer_class = ProgressTaskSerializer
 
     def get_queryset(self):
@@ -38,18 +40,21 @@ class ProgressTaskView(ListAPIView):
 
 
 @api_view(['POST'])
+@authentication_classes((SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
 def finish_task(request):
     if ('label' in request.data):
         try:
             finished_task = ProgressTask.objects.finish_task_by_label(
                 request.user, request.data['label'])
-            if finished_task is not None:
+            if finished_task:
                 return Response({"message": "Task finished Succeesslly"}, status=status.HTTP_201_CREATED)
             else:
                 return Response({"message": "Task already finished or closed"}, status=status.HTTP_201_CREATED)
 
         except Exception as error:
-            return Response({"message": error}, status=status.HTTP_400_BAD_REQUEST)
+            print (error)
+            return Response({"message": "error"}, status=status.HTTP_400_BAD_REQUEST)
 
     else:
         return Response({"message": "parameter \'label\' not in scoope"}, status=status.HTTP_400_BAD_REQUEST)

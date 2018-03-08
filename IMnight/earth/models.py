@@ -104,26 +104,38 @@ class HoldingVocherManager(models.Manager):
                     daily_vocher = [daily_vocher]
                     return daily_vocher
 
+    def check_daily(self, user):
+        try:
+            daily_vocher = HoldingVocher.objects.filter(
+                user=user).filter(created__date=datetime.date.today())
+        except Exception as error:
+            testlog.error(error)
+            return False
+        if daily_vocher:
+            return True
+        else:
+            return False
+
 
 class Store(models.Model):
-    storename = models.TextField(blank=False, default="Store")
+    title = models.TextField(blank=False, default="Store")
+    sub_title = models.TextField(null=True, blank=True)
+    info = models.TextField(null=True, blank=True)
     img = models.URLField(
         blank=False, default="https://i.imgur.com/67A5cyq.jpg")
-    title = models.TextField(null=True, blank=True)
-    sub_title = models.TextField(null=True, blank=True)
-    description = models.TextField(null=True, blank=True)
+    url = models.URLField(
+        blank=False, default="https://i.imgur.com/67A5cyq.jpg")
 
     def __str__(self):
-        return self.storename
+        return self.title
 
 
 class Vocher(models.Model):
     title = models.TextField(blank=False, default="Vocher")
-    sub_title = models.TextField()
     img = models.URLField(
         blank=False, default="https://i.imgur.com/67A5cyq.jpg")
     description = models.TextField(null=True, blank=True)
-
+    due_time = models.DateTimeField(default=timezone.now)
     store = models.ForeignKey(
         Store, on_delete=models.CASCADE)
 
