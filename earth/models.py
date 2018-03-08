@@ -39,9 +39,11 @@ class HoldingVocherManager(models.Manager):
             return holdingVochers
 
     def get_daily(self, user):
+        own_HoldingVocher = HoldingVocher.objects.filter(user=user)
+        own_vocher_pk = []
         try:
-            daily_vocher = HoldingVocher.objects.filter(
-                user=user).filter(created__date=datetime.date.today())
+            daily_vocher = own_HoldingVocher.filter(
+                created__date=datetime.date.today()).first()
         except Exception as error:
             testlog.error(error)
             return HoldingVocher.objects.none()
@@ -49,45 +51,34 @@ class HoldingVocherManager(models.Manager):
         if daily_vocher:
             return daily_vocher
         else:
-            own_HoldingVocher = HoldingVocher.objects.filter(user=user)
-            own_vocher_pk = []
             for holdingVocher in own_HoldingVocher:
                 own_vocher_pk.append(holdingVocher.vocher.pk)
-
             try:
-                remain_vochers = Vocher.objects.exclude(
+                undraw_vochers = Vocher.objects.exclude(
                     pk__in=own_vocher_pk)
             except Exception as error:
                 testlog.error(error)
-                remain_vochers = []
+                undraw_vochers = []
 
-            num = len(remain_vochers)
+            num_undraw_vochers = len(undraw_vochers)
             # check if already draw all performers
-            if num <= 0:
-                vochers = HoldingVocher.objects.filter(user=user)
-                error_vochers = vochers.filter(be_used=False)
-                if(len(error_vochers) > 0):
-                    for error_vocher in error_vochers:
-                        error_vocher.used = True
-                    testlog.warning(
-                        "Error because all vohcers are drawed, but there still some HoldingVocher.used=False")
-
+            if num_undraw_vochers <= 0:
                 all_vochers = Vocher.objects.all()
-                if(len(all_vochers) != len(vochers)):
+                if(len(all_vochers) != len(own_HoldingVocher)):
                     testlog.warning(
                         "Error because all vohcers are drawed, but amount not equal to all vochers")
 
-                vochers_num = len(vochers)
-                index = random.randint(0, vochers_num - 1)
-                daily_vocher = vochers[index]
-                daily_vocher.reset()
-                # return objects must be iterable
-                daily_vocher = [daily_vocher]
-                return daily_vocher
+                # vochers_num = len(vochers)
+                # index = random.randint(0, vochers_num - 1)
+                # daily_vocher = vochers[index]
+                # daily_vocher.reset()
+                # # return objects must be iterable
+                # return daily_vocher
+                return HoldingVocher.objects.none()
 
             else:
-                index = random.randint(0, num - 1)
-                vocher = remain_vochers[index]
+                index = random.randint(0, num_undraw_vochers - 1)
+                vocher = undraw_vochers[index]
 
                 try:
                     daily_vocher = self.create(
@@ -100,8 +91,6 @@ class HoldingVocherManager(models.Manager):
                     testlog.warning(error)
                     return HoldingVocher.objects.none()
                 else:
-                    # return objects must be iterable
-                    daily_vocher = [daily_vocher]
                     return daily_vocher
 
     def check_daily(self, user):
@@ -161,6 +150,7 @@ class HoldingVocher(models.Model):
     def reset(self):
         self.created = timezone.now
         self.be_used = False
+        self.save()
 
     def used(self):
         if(self.be_used != False):

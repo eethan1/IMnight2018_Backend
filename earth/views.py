@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from rest_framework.views import APIView
-from rest_framework.generics import GenericAPIView, ListAPIView
+from rest_framework.generics import GenericAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -27,7 +27,7 @@ def use_vocher(request):
         return Response({"message": "parameter \'label\' not in scoope"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class DailyVocherView(ListAPIView):
+class DailyVocherView(RetrieveAPIView):
     """
     取得當日的daily vocher
     """
@@ -35,11 +35,14 @@ class DailyVocherView(ListAPIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
     serializer_class = HoldingVocherSerializer
 
-    def get_queryset(self):
+    def get_object(self):
         user = self.request.user
 
         queryset = HoldingVocher.objects.get_daily(user)
-        return queryset
+        if queryset:
+            return queryset
+        else:
+            return Response({"auth_status": False})
 
 
 class StoreVocherView(ListAPIView):
