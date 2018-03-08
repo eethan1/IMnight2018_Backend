@@ -4,16 +4,18 @@ from .settings import *
 STATIC_URL = '/static/IMnight/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-# CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = (
     'night2018.ntu.im',
-    "ntu.im"
+    "ntu.im",
+    'imnight2018backend.ntu.im'
 )
 
 CSRF_TRUSTED_ORIGINS = (
     'night2018.ntu.im',
-    "ntu.im"
+    "ntu.im",
+    'imnight2018backend.ntu.im'
 )
 
 CORS_ALLOW_CREDENTIALS = True
