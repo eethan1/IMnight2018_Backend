@@ -106,7 +106,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'IMnight.wsgi.application'
-ASGI_APPLICATION = "IMnight.asgi.application"
+ASGI_APPLICATION = "IMnight.human.chat.routing.application"
 
 LOGIN_REDIRECT_URL = '/'
 
