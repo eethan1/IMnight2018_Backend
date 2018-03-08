@@ -203,6 +203,8 @@ REST_FRAMEWORK = {
     )
 }
 
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # TLS Port
 EMAIL_PORT = 587
