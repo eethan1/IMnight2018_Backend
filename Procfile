@@ -1,1 +1,1 @@
-web: python3 manage.py runserver 140.112.106.45:8000
+web: python3 IMnight/manage.py runserver 140.112.106.45:8000
