@@ -111,6 +111,8 @@ LOGIN_REDIRECT_URL = '/'
 
 ACCOUNT_ADAPTER = 'accounts.social.adapter.MyAccountAdapter'
 
+SOCIALACCOUNT_ADAPTER = 'accounts.social.adapter.MySocialAccountAdapter'
+
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
 AUTHENTICATION_BACKENDS = (
