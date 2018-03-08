@@ -106,6 +106,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'IMnight.wsgi.application'
+ASGI_APPLICATION = "IMnight.asgi.application"
 
 LOGIN_REDIRECT_URL = '/'
 
