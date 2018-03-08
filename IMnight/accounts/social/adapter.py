@@ -15,7 +15,7 @@ class MyAccountAdapter(DefaultAccountAdapter):
 
 
 class MySocialAccountAdapter(DefaultSocialAccountAdapter):
-    def get_connect_redirect_url(self, request, socialaccount)
+    def get_connect_redirect_url(self, request, socialaccount):
         path = "https://ntu.im/night/2018/view/template.html"
         # return path.format(username=request.user.username)
         return path
