@@ -26,7 +26,7 @@ CSRF_COOKIE_DOMAIN = "ntu.im"
 
 
 # Allow all host headers.
-ALLOWED_HOSTS = ['127.0.0.1', '140.112.106.45', 'ntu.im',
+ALLOWED_HOSTS = ['testbackend.ntu.im', '127.0.0.1', '140.112.106.45', 'ntu.im',
                  'imnight2018.ntu.im', 'imnight2018backend.ntu.im']
 
 # Turn off DEBUG mode.
