@@ -31,7 +31,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'channels',
     'jet.dashboard',
     'jet',
     'django.contrib.admin',
@@ -43,6 +42,9 @@ INSTALLED_APPS = [
 
 
     'corsheaders',
+
+
+    'channels',
 
     # django REST framework
     # http://www.django-rest-framework.org
@@ -106,7 +108,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'IMnight.wsgi.application'
-ASGI_APPLICATION = "IMnight.human.chat.routing.application"
+ASGI_APPLICATION = "IMnight.routing.application"
 
 LOGIN_REDIRECT_URL = '/'
 
@@ -232,13 +234,22 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # https://blog.heroku.com/in_deep_with_django_channels_the_future_of_real_time_apps_in_django
 redis_host = os.environ.get('REDIS_HOST', 'localhost')
 
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [os.environ.get('REDIS_URL', 'redis://140.112.106.45:6379')],
+#         },
+#         # "ROUTING": "IMnight.asgi:application",
+#     },
+# }
+
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [os.environ.get('REDIS_URL', 'redis://140.112.106.45:6379')],
         },
-        "ROUTING": "human.chat.routing.channel_routing",
     },
 }
 

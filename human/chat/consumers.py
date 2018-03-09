@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 
-from channels import Group
-from channels.sessions import channel_session
+from channels.generic.websocket import WebsocketConsumer, JsonWebsocketConsumer
+
+from asgiref.sync import async_to_sync
 
 from human.models import Relationship
 from human.chat.models import Message
@@ -14,97 +15,71 @@ import logging
 testlog = logging.getLogger('testdevelop')
 
 
-@channel_session
-def ws_connect(message):
-    """
-    called when a websocket is create
-    establish a websocket connection and add the user into a chatroom group
-    """
+class ChatConsumer(JsonWebsocketConsumer):
 
-    # this is for checking websocket address
-    prefix, prefix2, label = message['path'].strip("/").split("/")
-    if prefix != 'human' and prefix2 != 'chat':
-        testlog.error('invalid ws path=%s', message['path'])
-        return
-    try:
-        room = Relationship.objects.get(label=label)
-    except Relationship.DoesNotExist:
-        testlog.error('No relationship have this label=%s', label)
-        return
-    except Exception as error:
-        testlog.warning(error)
-        return
+    groups = ["chat"]
 
-    # Accept the incoming connection
-    message.reply_channel.send(
-        {'accept': True}
-    )
+    def connect(self):
+        """
+        called when a websocket is create
+        establish a websocket connection and add the user into a chatroom group
+        """
 
-    message.channel_session['room'] = room.label
+        label = self.scope["url_route"]["kwargs"]["label"]
+        self.user = self.scope["user"]
 
-    # Add this client to the "chat-{label}" group
-    Group('chat-' + label,
-          channel_layer=message.channel_layer).add(message.reply_channel)
+        try:
+            room = Relationship.objects.get(label=label)
+        except Relationship.DoesNotExist:
+            testlog.error('No relationship have this label=%s', label)
+            self.close()
+            return
+        except Exception as error:
+            self.close()
+            return
 
+        if not (room.client == self.user or room.performer == self.user):
+            testlog.warning(
+                '%s try to connect to the relationship that not belog to him', self.user)
+            self.close()
+            return
 
-@channel_session
-def ws_receive(message):
-    """
-    called when message is recieved websocket
-    """
-    # Look up the room from the channel session, bailing if it doesn't exist
-    try:
-        label = message.channel_session['room']
-        room = Relationship.objects.get(label=label)
-    except KeyError:
-        testlog.error(
-            'no room label in channel_session, full message: \n%s', message)
-        return
-    except Relationship.DoesNotExist:
-        testlog.error(
-            'recieved message, but no relationship have this label=%s', label)
-        return
-    except Exception as error:
-        testlog.warning(error)
-        return
+        self.scope["room"] = room
+        # Accept the incoming connection
+        self.accept()
 
-    # Parse out a chat message from the content text, bailing if it doesn't
-    try:
-        data = json.loads(message.content['text'])
-    except ValueError:
-        testlog.error(
-            "message send by ws isn't json text, full message: \n%s", message)
-        return
-    except Exception as error:
-        testlog.warning(error)
-        return
+        async_to_sync(self.channel_layer.group_add)("chat", self.channel_name)
 
-    # conform to the expected message format.
-    if set(data.keys()) != set(('handle', 'message')):
-        testlog.warning(
-            "message send by ws contain unexpected format data: \n%s", data)
-        return
+    def receive_json(self, content):
+        self.user = self.scope["user"]
+        room = self.scope["room"]
 
-    if data:
-        handle = data["handle"]
-        user = User.objects.get(username=handle)
-        msg = data["message"]
-        m = Message.objects.create(room=room, handle=user, message=msg)
+        """
+        called when message is recieved websocket
+        """
 
-        # send the massage to the clients in Group
-        Group('chat-' + label,
-              channel_layer=message.channel_layer).send({
-                  'text': json.dumps(m.as_dict())
-              })
-    else:
-        testlog.warning(
-            "message data send by ws is NULL, full message: \n%s", message)
+        if content:
+            if content["message"]:
+                msg = content["message"]
+                m = Message.objects.create(
+                    room=room, handle=self.user, message=msg)
 
+                async_to_sync(self.channel_layer.group_send)(
+                    "chat",
+                    {
+                        "type": "chat.message",
+                        "text": json.dumps(m.as_dict()),
+                    },
+                )
 
-@channel_session
-def ws_disconnect(message):
-    """
-    called when websocket is closed
-    """
-    Group('chat-' + label,
-          channel_layer=message.channel_layer).discard(message.reply_channel)
+        else:
+            testlog.warning(
+                "message data send by ws is NULL, full message: \n%s", message)
+
+    def disconnect(self, close_code):
+        """
+        called when websocket is closed
+        """
+
+        async_to_sync(self.channel_layer.group_discard)(
+            "chat", self.channel_name)
