@@ -56,7 +56,7 @@ class Course(models.Model):
 def create_course_task(sender, instance, created, **kwargs):
     if created:
         instance.task = Task.objects.create(
-            name=("讀完了" + instance.title),
+            name=("讀完了" + instance.teacher + " " + instance.name),
             description="讀完課程",
             due_date=date(2018, 5, 8),
             category=4,
