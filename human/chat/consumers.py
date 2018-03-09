@@ -76,6 +76,9 @@ class ChatConsumer(JsonWebsocketConsumer):
             testlog.warning(
                 "message data send by ws is NULL, full message: \n%s", message)
 
+    def chat_message(self, event):
+        self.send_json(event["text"])
+
     def disconnect(self, close_code):
         """
         called when websocket is closed
