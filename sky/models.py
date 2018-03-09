@@ -64,6 +64,7 @@ def create_course_task(sender, instance, created, **kwargs):
             credit=1,
             label=0,
         )
+        instance.save()
 
 
 class Article(models.Model):
@@ -116,6 +117,7 @@ def create_article_task(sender, instance, created, **kwargs):
             credit=1,
             label=0,
         )
+        instance.save()
 
 
 class News(models.Model):
