@@ -27,6 +27,9 @@ class Course(models.Model):
     created = models.DateTimeField(default=timezone.now)
     label = models.SlugField(unique=True, blank=True)
 
+    task = models.ForeignKey(
+        Task, on_delete=models.CASCADE, null=True)
+
     objects = models.Manager()
 
     class Meta:
@@ -47,6 +50,20 @@ class Course(models.Model):
             self.label = course_label
 
         super(Course, self).save(*args, **kwargs)
+
+
+@receiver(post_save, sender=Course)
+def create_course_task(sender, instance, created, **kwargs):
+    if created:
+        instance.task = Task.objects.create(
+            name=("讀完了" + instance.title),
+            description="讀完課程",
+            due_date=date(2018, 5, 8),
+            category=4,
+            activated=True,
+            credit=1,
+            label=0,
+        )
 
 
 class Article(models.Model):
@@ -88,7 +105,7 @@ class Article(models.Model):
 
 
 @receiver(post_save, sender=Article)
-def create_user_profile(sender, instance, created, **kwargs):
+def create_article_task(sender, instance, created, **kwargs):
     if created:
         instance.task = Task.objects.create(
             name=("讀完了" + instance.title),
