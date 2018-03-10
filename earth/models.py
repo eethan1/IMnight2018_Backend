@@ -106,7 +106,7 @@ class HoldingVocherManager(models.Manager):
                     vocher = week_limit_vocher[random.randint(
                         0, len(week_limit_vocher) - 1)]
 
-                elif len(week_limit_vocher) > 0:
+                elif len(normal_vocher) > 0:
                     vocher = normal_vocher[random.randint(
                         0, len(normal_vocher) - 1)]
                 else:
