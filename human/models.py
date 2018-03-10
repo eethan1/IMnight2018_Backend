@@ -179,7 +179,7 @@ class Relationship(models.Model):
         User, on_delete=models.CASCADE, related_name='performer')
     created = models.DateTimeField(default=timezone.now)
     # this label is used to identify chatroom
-    label = models.SlugField(unique=True)
+    label = models.SlugField(unique=True, blank=True)
 
     # set the model manager to FriendshipManager()
     objects = RelationshipManager()

@@ -28,7 +28,7 @@ class Course(models.Model):
     label = models.SlugField(unique=True, blank=True)
 
     task = models.ForeignKey(
-        Task, on_delete=models.CASCADE, null=True)
+        Task, on_delete=models.CASCADE, blank=True)
 
     objects = models.Manager()
 
@@ -81,7 +81,7 @@ class Article(models.Model):
     label = models.SlugField(unique=True, blank=True)
 
     task = models.ForeignKey(
-        Task, on_delete=models.CASCADE, null=True)
+        Task, on_delete=models.CASCADE, blank=True)
 
     objects = models.Manager()
 

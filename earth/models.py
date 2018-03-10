@@ -140,7 +140,7 @@ class HoldingVocher(models.Model):
     be_used = models.BooleanField(default=False)
     created = models.DateTimeField(default=timezone.now)
 
-    label = models.SlugField(unique=True)
+    label = models.SlugField(unique=True, blank=True)
 
     objects = HoldingVocherManager()
 

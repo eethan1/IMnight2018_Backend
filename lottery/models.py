@@ -38,7 +38,7 @@ class Task(models.Model):
     activated = models.BooleanField(default=False)
     category = models.SmallIntegerField(
         default=1, choices=TASK_CATEGORY_CHOICE)
-    label = models.SlugField(unique=True)
+    label = models.SlugField(unique=True, blank=True)
 
     objects = models.manager
 
