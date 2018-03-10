@@ -38,7 +38,7 @@ class DailyVocherView(ListAPIView):
     authentication_classes = (SessionAuthentication, BasicAuthentication)
     serializer_class = HoldingVocherSerializer
 
-    def get_object(self):
+    def get_queryset(self):
         user = self.request.user
 
         queryset = HoldingVocher.objects.get_daily(user)
