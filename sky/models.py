@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
 from lottery.models import Task
@@ -65,6 +65,11 @@ def create_course_task(sender, instance, created, **kwargs):
             label=0,
         )
         instance.save()
+
+
+# @receiver(pre_delete, sender=Course)
+# def delete_course_task(sender, instance, using, **kwargs):
+#     instance.task.delete()
 
 
 class Article(models.Model):
