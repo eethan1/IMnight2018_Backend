@@ -188,6 +188,7 @@ class Relationship(models.Model):
         verbose_name = 'Relationship'
         verbose_name_plural = 'My Relationships'
         unique_together = ('client', 'performer')
+        ordering = ['client', 'performer', '-created']
 
     def __str__(self):
         return "Client \"%s\" Performer \"%s\"" % (self.client.username, self.performer.username)

@@ -144,6 +144,9 @@ class HoldingVocher(models.Model):
 
     objects = HoldingVocherManager()
 
+    class Meta:
+        ordering = ['user', 'vocher', 'be_used', '-created']
+
     def __str__(self):
         return "%s have %s" % (self.user, self.vocher)
 

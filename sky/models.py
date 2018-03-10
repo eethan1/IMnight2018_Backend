@@ -34,6 +34,7 @@ class Course(models.Model):
 
     class Meta:
         verbose_name = "Course"
+        ordering = ['-teacher', '-created']
 
     def __str__(self):
         return '%s teacher:%s label:%s' % (self.name, self.teacher, self.label)
@@ -92,6 +93,7 @@ class Article(models.Model):
 
     class Meta:
         verbose_name = "Article"
+        ordering = ['category', '-title', '-created']
 
     def __str__(self):
         return '%s %s label:%s' % (self.title, ARTICLE_CATEGORY_CHOICE[self.category - 1][1], self.label)
@@ -135,9 +137,10 @@ class News(models.Model):
 
     class Meta:
         verbose_name = "News"
+        ordering = ['-created', 'title']
 
     def __str__(self):
-        return self.title
+        return self.title + " " + str(self.created)
 
     def save(self, *args, **kwargs):
         hashkey = self.title + str(self.created)

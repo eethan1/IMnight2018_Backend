@@ -42,6 +42,9 @@ class Task(models.Model):
 
     objects = models.manager
 
+    class Meta:
+        ordering = ['category', 'due_date', '-credit']
+
     def __str__(self):
         return "%s %s have %d credit, due in %s, label:%s" % (self.name, TASK_CATEGORY_CHOICE[self.category - 1][1], self.credit, self.due_date, self.label)
 
@@ -106,6 +109,9 @@ class ProgressTask(models.Model):
     # is_finish = models.BooleanField(default=False)
 
     objects = ProgressTaskManager()
+
+    class Meta:
+        ordering = ['user', 'task', '-last_active_date']
 
     def __str__(self):
         return "'%s' have a '%s' task created on %s." % (self.user.username, self.task.name, self.last_active_date)
