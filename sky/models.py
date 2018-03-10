@@ -136,6 +136,9 @@ class News(models.Model):
     class Meta:
         verbose_name = "News"
 
+    def __str__(self):
+        return self.title
+
     def save(self, *args, **kwargs):
         hashkey = self.title + str(self.created)
         news_label = hash(hashkey) % (10 ** 20)
