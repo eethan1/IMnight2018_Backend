@@ -1,1 +1,2 @@
-web: python3.6 manage.py runserver 0.0.0.0:5000
+web: daphne -p 5000 -b 0.0.0.0 IMnight.asgi:application
+worker: gunicorn IMnight.wsgi -b 0.0.0.0:5000
