@@ -44,7 +44,8 @@ class SelfDetailsView(RetrieveUpdateAPIView):
 
 class UserDetailsView(ListAPIView):
     """
-    取得某特定用戶資料（Include Profile）
+    用username，取得特定用戶的資料（Include Profile）
+    假如username留空，則會回傳所有用戶的資料（Include Profile）
     """
     permission_classes = (IsAuthenticated,)
     serializer_class = UserDetailsSerializer

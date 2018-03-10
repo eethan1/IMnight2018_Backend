@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
+from django.contrib.auth.models import Group
 
 import datetime
 import random
@@ -35,6 +36,9 @@ class Profile(models.Model):
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
+    # clinets_group = Group.objects.get(name='Clients')
+    clinets_group = Group.objects.get(name='Clients')
+    print(instance.groups.add(clinets_group))
     if created:
         Profile.objects.create(user=instance)
 
@@ -136,16 +140,36 @@ class RelationshipManager(models.Manager):
                     return daily_performer
 
     def check_daily(self, user):
+        is_performer_drawn = False
+        is_all_drawn = False
         try:
             daily_performer = Relationship.objects.filter(
                 client=user).filter(created__date=datetime.date.today())
         except Exception as error:
             testlog.error(error)
-            return False
+            return (is_performer_drawn, is_all_drawn)
+
         if daily_performer:
-            return True
-        else:
-            return False
+            # already draw daily performer
+            is_performer_drawn = True
+            # not yet draw daily performer
+            own_relationship = Relationship.objects.filter(client=user)
+            own_performer_pk = []
+            for relationship in own_relationship:
+                own_performer_pk.append(relationship.performer.pk)
+
+            try:
+                all_performers = User.objects.filter(
+                    groups__name='Performers').exclude(pk__in=own_performer_pk)
+                print(all_performers)
+            except Exception as error:
+                testlog.error(error)
+                return (is_performer_drawn, is_all_drawn)
+
+            if len(all_performers) == 0:
+                is_all_drawn = True
+
+        return (is_performer_drawn, is_all_drawn)
 
 
 class Relationship(models.Model):

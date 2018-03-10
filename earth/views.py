@@ -18,6 +18,9 @@ from earth.serializers import HoldingVocherSerializer, VocherSerializer, UseVoch
 @permission_classes((IsAuthenticated,))
 @authentication_classes((SessionAuthentication, BasicAuthentication))
 def use_vocher(request):
+    """
+    記得一定要設 contentType: "application/json" 才會用payload 而不是 formdata
+    """
     if ('label' in request.data):
         if HoldingVocher.objects.used_vocher(request.user, request.data['label']):
             return Response({"message": "Used Succeesslly"}, status=status.HTTP_201_CREATED)
