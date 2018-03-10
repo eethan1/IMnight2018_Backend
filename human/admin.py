@@ -5,6 +5,8 @@ from django.contrib.auth.admin import UserAdmin
 from human.models import Profile, Relationship
 from human.chat.models import Message
 
+from IMnight.utils import ModelWithLabelAdmin
+
 
 class RelationshipInLine(admin.TabularInline):
     model = Relationship
@@ -37,10 +39,10 @@ class UserAdmin(admin.ModelAdmin):
     inlines = (ProfileInLine, ClientInLine, PerformerInLine,)
 
 
-class RelationshipAdmin(admin.ModelAdmin):
-    list_display = ('label', 'client', 'performer')
-
-
+# class RelationshipAdmin(admin.ModelAdmin):
+#     list_display = ('label', 'client', 'performer')
+#
+#
 class MessageAdmin(admin.ModelAdmin):
     list_display = ('room', 'handle', 'message', 'timestamp')
 
@@ -48,5 +50,5 @@ class MessageAdmin(admin.ModelAdmin):
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(Profile)
-admin.site.register(Relationship, RelationshipAdmin)
+admin.site.register(Relationship, ModelWithLabelAdmin)
 admin.site.register(Message, MessageAdmin)
