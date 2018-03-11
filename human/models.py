@@ -7,6 +7,7 @@ from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.contrib.auth.models import Group
+from django.db.models import Q
 
 import datetime
 import random
@@ -86,13 +87,13 @@ class RelationshipManager(models.Manager):
         return clients
 
     def get_daily(self, user):
-        if is_performer(user):
-            raise ValidationError(
-                "You can't get daily_performer from a performer")
+        # if is_performer(user):
+        #     raise ValidationError(
+        #         "You can't get daily_performer from a performer")
 
         try:
             daily_performer = Relationship.objects.filter(
-                client=user).filter(created__date=datetime.date.today())
+                Q(client=user) | Q(performer=user)).filter(created__date=datetime.date.today())
         except Exception as error:
             testlog.error(error)
             return Relationship.objects.none()
@@ -102,14 +103,14 @@ class RelationshipManager(models.Manager):
             return daily_performer
         else:
             # not yet draw daily performer
-            own_relationship = Relationship.objects.filter(client=user)
-            own_performer_pk = []
+            own_relationship = Relationship.objects.filter(
+                Q(client=user) | Q(performer=user))
+            own_performer_pk = [user.pk]
             for relationship in own_relationship:
                 own_performer_pk.append(relationship.performer.pk)
 
             try:
-                all_performers = User.objects.filter(
-                    groups__name='Performers').exclude(pk__in=own_performer_pk)
+                all_performers = User.objects.exclude(pk__in=own_performer_pk)
             except Exception as error:
                 testlog.error(error)
                 all_performers = []
@@ -196,10 +197,10 @@ class Relationship(models.Model):
 
     def save(self, *args, **kwargs):
         # Some identity check for the User
-        if not is_client(self.client):
-            raise ValidationError("self.client is not in Clients Group")
-        if not is_performer(self.performer):
-            raise ValidationError("self.performer is not in Performers Group")
+        # if not is_client(self.client):
+        #     raise ValidationError("self.client is not in Clients Group")
+        # if not is_performer(self.performer):
+        #     raise ValidationError("self.performer is not in Performers Group")
         if self.client == self.performer:
             raise ValidationError(
                 "self.client and slef.performer can't be same person")
