@@ -8,7 +8,8 @@ from human.models import Profile, Relationship
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ('nickname', 'job', 'img', 'bio', 'birth_date', 'point')
+        fields = ('nickname', 'job', 'job_description',
+                  'img', 'bio', 'birth_date', 'point')
 
 
 class UserDetailsSerializer(serializers.ModelSerializer):
