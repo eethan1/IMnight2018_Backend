@@ -27,6 +27,9 @@ class ChatView(ListAPIView):
             print ("ws room does not exist label=%s", label)
             return []
 
+        if room.client != self.request.user and room.performer != self.request.user:
+            return []
+
         messages = room.messages.order_by('timestamp')
 
         # query_range = self.request.query_params.get('query_range', None)
