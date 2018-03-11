@@ -19,6 +19,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     nickname = models.TextField(max_length=50, blank=True)
     job = models.TextField(max_length=500, blank=True)
+    job_description = models.TextField(max_length=500, blank=True)
     bio = models.TextField(max_length=500, blank=True)
     birth_date = models.DateField(null=True, blank=True)
     point = models.PositiveIntegerField(default=0, blank=False, null=False)
