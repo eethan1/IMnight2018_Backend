@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 from rest_framework import status
 from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView, ListAPIView
@@ -75,7 +76,8 @@ class RelationshipDetailsView(ListAPIView):
         user = self.request.user
 
         try:
-            queryset = Relationship.objects.get_performers(user)
+            queryset = Relationship.objects.filter(
+                Q(client=user) | Q(performer=user))
         except ValidationError as error:
             testlog.error(error)
         except Exception as error:
