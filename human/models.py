@@ -103,14 +103,17 @@ class RelationshipManager(models.Manager):
             return daily_performer
         else:
             # not yet draw daily performer
-            own_relationship = Relationship.objects.filter(
-                Q(client=user) | Q(performer=user))
             own_performer_pk = [user.pk]
+            own_relationship = Relationship.objects.filter(client=user)
             for relationship in own_relationship:
                 own_performer_pk.append(relationship.performer.pk)
+            own_relationship = Relationship.objects.filter(performer=user)
+            for relationship in own_relationship:
+                own_performer_pk.append(relationship.client.pk)
 
             try:
-                all_performers = User.objects.exclude(pk__in=own_performer_pk)
+                all_performers = User.objects.exclude(
+                    groups__name__exact="Performers").exclude(pk__in=own_performer_pk)
             except Exception as error:
                 testlog.error(error)
                 all_performers = []
