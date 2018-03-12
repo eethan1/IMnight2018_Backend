@@ -147,6 +147,8 @@ class Store(models.Model):
         blank=False, default="https://i.imgur.com/67A5cyq.jpg")
     url = models.URLField(
         blank=False, default="https://i.imgur.com/67A5cyq.jpg")
+    bg_url = models.URLField(
+        blank=False, default="https://i.imgur.com/67A5cyq.jpg")
 
     def __str__(self):
         return self.title
