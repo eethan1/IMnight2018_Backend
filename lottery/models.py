@@ -17,7 +17,6 @@ TASK_CATEGORY_CHOICE = (
     (1, "每日任務"),
     (2, "限時任務"),
     (3, "彩蛋"),
-    (4, "閱讀文章")
 )
 
 
@@ -46,7 +45,7 @@ class Task(models.Model):
         ordering = ['category', 'due_date', '-credit']
 
     def __str__(self):
-        return "%s %s have %d credit, due in %s, label:%s" % (self.name, TASK_CATEGORY_CHOICE[self.category - 1][1], self.credit, self.due_date, self.label)
+        return "%s [%s] have %d credit, due in %s, label:%s" % (self.name, TASK_CATEGORY_CHOICE[self.category-1][1], self.credit, self.due_date, self.label)
 
     def save(self, *args, **kwargs):
         hashkey = self.name + str(self.due_date)
@@ -76,8 +75,14 @@ class ProgressTaskManager(models.Manager):
             return ProgressTask.objects.filter(user=user)
 
     def finish_task_by_label(self, user, task_label):
+        """
+        if finish successlly return task.credit, otherwise return 0. 
+        """
         task = Task.objects.filter(label=task_label).first()
+
         if task:
+            if task.due_date < timezone.now():
+                return False
             try:
                 obj, created = ProgressTask.objects.get_or_create(
                     user=user, task=task)
@@ -87,15 +92,15 @@ class ProgressTaskManager(models.Manager):
 
             if created:
                 user.profile.add_point(task.credit)
-                return True
+                return task.credit
             else:
+                if task.category != 1:
+                    return False
                 if obj.last_active_date.date() != datetime.datetime.today().date():
                     user.profile.add_point(task.credit)
                     obj.last_active_date = datetime.datetime.today()
                     obj.save()
-                    return True
-                else:
-                    return False
+                    return task.credit
         else:
             return False
 
