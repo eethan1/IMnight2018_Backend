@@ -76,7 +76,7 @@ class ProgressTaskManager(models.Manager):
 
     def finish_task_by_label(self, user, task_label):
         """
-        if finish successlly return task.credit, otherwise return 0. 
+        if finish successlly return task.credit, otherwise return 0.
         """
         task = Task.objects.filter(label=task_label).first()
 
@@ -92,7 +92,7 @@ class ProgressTaskManager(models.Manager):
 
             if created:
                 user.profile.add_point(task.credit)
-                return task.credit
+                return task
             else:
                 if task.category != 1:
                     return False
@@ -100,7 +100,7 @@ class ProgressTaskManager(models.Manager):
                     user.profile.add_point(task.credit)
                     obj.last_active_date = datetime.datetime.today()
                     obj.save()
-                    return task.credit
+                    return task
         else:
             return False
 

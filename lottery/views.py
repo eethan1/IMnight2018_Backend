@@ -8,10 +8,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
-from rest_framework import status
 
 from lottery.models import Task, ProgressTask
-from lottery.serializers import ProgressTaskSerializer
+from lottery.serializers import ProgressTaskSerializer, TaskSerializer
 
 import logging
 testlog = logging.getLogger('testdevelop')
@@ -48,13 +47,17 @@ def finish_task(request):
             finished_task = ProgressTask.objects.finish_task_by_label(
                 request.user, request.data['label'])
             if finished_task:
-                return Response({"message": "Task finished Succeesslly"}, status=status.HTTP_201_CREATED)
+                serializer = TaskSerializer(finished_task)
+                return Response(serializer.data)
             else:
-                return Response({"message": "Task already finished or closed"}, status=status.HTTP_201_CREATED)
+                return Response({"message": "Task already finished or closed"},
+                                status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as error:
             print (error)
-            return Response({"message": "error"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "error"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
     else:
-        return Response({"message": "parameter \'label\' not in scoope"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "parameter \'label\' not in scoope"},
+                        status=status.HTTP_400_BAD_REQUEST)
