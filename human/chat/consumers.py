@@ -17,8 +17,6 @@ testlog = logging.getLogger('testdevelop')
 
 class ChatConsumer(JsonWebsocketConsumer):
 
-    groups = ["chat"]
-
     def connect(self):
         """
         called when a websocket is create
@@ -52,8 +50,10 @@ class ChatConsumer(JsonWebsocketConsumer):
             "chat" + str(label), self.channel_name)
 
     def receive_json(self, content):
+
         self.user = self.scope["user"]
         room = self.scope["room"]
+        label = self.scope["url_route"]["kwargs"]["label"]
 
         """
         called when message is recieved websocket
@@ -66,7 +66,7 @@ class ChatConsumer(JsonWebsocketConsumer):
                     room=room, handle=self.user, message=msg)
 
                 async_to_sync(self.channel_layer.group_send)(
-                    "chat",
+                    "chat" + str(label),
                     {
                         "type": "chat.message",
                         "text": json.dumps(m.as_dict()),
