@@ -48,7 +48,8 @@ class ChatConsumer(JsonWebsocketConsumer):
         # Accept the incoming connection
         self.accept()
 
-        async_to_sync(self.channel_layer.group_add)("chat", self.channel_name)
+        async_to_sync(self.channel_layer.group_add)(
+            "chat" + str(label), self.channel_name)
 
     def receive_json(self, content):
         self.user = self.scope["user"]

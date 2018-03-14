@@ -25,7 +25,7 @@ class Profile(models.Model):
     birth_date = models.DateField(null=True, blank=True)
     point = models.PositiveIntegerField(default=0, blank=False, null=False)
     img = models.URLField(
-        default="https://scontent.fkhh1-1.fna.fbcdn.net/v/t1.0-9/10712978_745859095491727_8519447814807561759_n.jpg?oh=51a1b3c040bebb38f221053aeb2c42db&oe=5B16C07D")
+        default="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg")
 
     def __str__(self):
         return self.user.username
