@@ -99,8 +99,9 @@ class RelationshipManager(models.Manager):
             return Relationship.objects.none()
 
         if daily_performer:
-            # already draw daily performer
-            return daily_performer
+            if daily_performer.client == user:
+                # already draw daily performer
+                return daily_performer
         else:
             # not yet draw daily performer
             own_performer_pk = [user.pk]
