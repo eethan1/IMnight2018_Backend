@@ -142,8 +142,6 @@ SOCIALACCOUNT_PROVIDERS = {
             'locale',
             'timezone',
             'link',
-            'gender',
-            'updated_time',
         ],
         'EXCHANGE_TOKEN': True,
         'LOCALE_FUNC': lambda request: 'en_US',
