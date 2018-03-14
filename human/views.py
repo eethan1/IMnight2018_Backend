@@ -78,11 +78,20 @@ class RelationshipDetailsView(ListAPIView):
         try:
             queryset = Relationship.objects.filter(
                 Q(client=user) | Q(performer=user))
+
         except ValidationError as error:
             testlog.error(error)
         except Exception as error:
             testlog.warning(error)
         else:
+            for relationship in queryset:
+                if relationship.performer == user:
+                    tmp = relationship.performer
+                    relationship.performer = relationship.client
+                    relationship.client = tmp
+                    # !!! DO NOT SAVE HERE
+                    # this is the quick fix
+                    # but not well written
             return queryset
 
 

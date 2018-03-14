@@ -112,7 +112,7 @@ class RelationshipManager(models.Manager):
                 own_performer_pk.append(relationship.client.pk)
 
             try:
-                all_performers = User.objects.exclude(
+                all_performers = User.objects.filter(
                     groups__name__exact="Performers").exclude(pk__in=own_performer_pk)
             except Exception as error:
                 testlog.error(error)
