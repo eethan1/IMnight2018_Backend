@@ -149,30 +149,34 @@ class RelationshipManager(models.Manager):
         is_all_drawn = False
         try:
             daily_performer = Relationship.objects.filter(
-                client=user).filter(created__date=datetime.date.today())
+                Q(client=user) | Q(performer=user)).filter(created__date=datetime.date.today())
         except Exception as error:
             testlog.error(error)
             return (is_performer_drawn, is_all_drawn)
 
         if daily_performer:
-            # already draw daily performer
-            is_performer_drawn = True
-            # not yet draw daily performer
-            own_relationship = Relationship.objects.filter(client=user)
-            own_performer_pk = []
-            for relationship in own_relationship:
-                own_performer_pk.append(relationship.performer.pk)
+            # because if you draw the card, you will always in the client field
+            if daily_performer.client == user:
+                # already draw daily performer
+                is_performer_drawn = True
 
-            try:
-                all_performers = User.objects.filter(
-                    groups__name='Performers').exclude(pk__in=own_performer_pk)
-                print(all_performers)
-            except Exception as error:
-                testlog.error(error)
-                return (is_performer_drawn, is_all_drawn)
+        own_performer_pk = [user.pk]
+        own_relationship = Relationship.objects.filter(client=user)
+        for relationship in own_relationship:
+            own_performer_pk.append(relationship.performer.pk)
+        own_relationship = Relationship.objects.filter(performer=user)
+        for relationship in own_relationship:
+            own_performer_pk.append(relationship.client.pk)
 
-            if len(all_performers) == 0:
-                is_all_drawn = True
+        try:
+            all_performers = User.objects.filter(
+                groups__name__exact="Performers").exclude(pk__in=own_performer_pk)
+        except Exception as error:
+            testlog.error(error)
+            return (is_performer_drawn, is_all_drawn)
+
+        if len(all_performers) == 0:
+            is_all_drawn = True
 
         return (is_performer_drawn, is_all_drawn)
 
