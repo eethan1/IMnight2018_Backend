@@ -1,10 +1,10 @@
-from django.conf import settings
 from django.dispatch import receiver
 
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 
 from allauth.account.signals import user_signed_up, user_logged_in
+
 
 class MyAccountAdapter(DefaultAccountAdapter):
     def get_login_redirect_url(self, request):
@@ -34,6 +34,7 @@ def social_signup(sociallogin, user, **kwargs):
         user.username = sociallogin.account.extra_data['name']
         user.profile.img = picture_url
         user.save()
+
 
 @receiver(user_logged_in)
 def social_login(sociallogin, user, **kwargs):
