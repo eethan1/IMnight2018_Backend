@@ -93,7 +93,7 @@ class RelationshipManager(models.Manager):
 
         try:
             daily_performer = Relationship.objects.filter(
-                Q(client=user) | Q(performer=user)).filter(created__date=datetime.date.today())
+                Q(client=user) | Q(performer=user)).filter(created__date=datetime.date.today()).first()
         except Exception as error:
             testlog.error(error)
             return Relationship.objects.none()
