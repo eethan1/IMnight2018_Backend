@@ -4,8 +4,11 @@ from channels.generic.websocket import WebsocketConsumer, JsonWebsocketConsumer
 
 from asgiref.sync import async_to_sync
 
+from rest_framework.renderers import JSONRenderer
+
 from human.models import Relationship
 from human.chat.models import Message
+from human.chat.serializers import MessageSerializer
 
 
 import re
@@ -64,18 +67,20 @@ class ChatConsumer(JsonWebsocketConsumer):
                 msg = content["message"]
                 m = Message.objects.create(
                     room=room, handle=self.user, message=msg)
+                serializer = MessageSerializer(m)
+                json = JSONRenderer().render(serializer.data)
 
                 async_to_sync(self.channel_layer.group_send)(
                     "chat" + str(label),
                     {
                         "type": "chat.message",
-                        "text": json.dumps(m.as_dict()),
+                        "text": json,
                     },
                 )
 
         else:
             testlog.warning(
-                "message data send by ws is NULL, full message: \n%s", message)
+                "message data send by ws is NULL, full message: \n%s", content)
 
     def chat_message(self, event):
         self.send_json(event["text"])
