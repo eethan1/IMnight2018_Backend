@@ -68,13 +68,13 @@ class ChatConsumer(JsonWebsocketConsumer):
                 m = Message.objects.create(
                     room=room, handle=self.user, message=msg)
                 serializer = MessageSerializer(m)
-                json = JSONRenderer().render(serializer.data)
+                print(serializer.data)
 
                 async_to_sync(self.channel_layer.group_send)(
                     "chat" + str(label),
                     {
                         "type": "chat.message",
-                        "text": json,
+                        "text": serializer.data,
                     },
                 )
 
