@@ -18,7 +18,6 @@ testlog = logging.getLogger('testdevelop')
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    nickname = models.TextField(max_length=50, blank=True)
     job = models.TextField(max_length=500, blank=True)
     job_description = models.TextField(max_length=500, blank=True)
     bio = models.TextField(max_length=500, blank=True)
