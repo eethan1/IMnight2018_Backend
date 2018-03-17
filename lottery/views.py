@@ -16,6 +16,26 @@ import logging
 testlog = logging.getLogger('testdevelop')
 
 
+class TaskView(ListAPIView):
+    permission_classes = (IsAuthenticated, )
+    authentication_classes = (SessionAuthentication, BasicAuthentication)
+    serializer_class = TaskSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if 'label' in self.kwargs:
+            label = self.kwargs['label']
+            try:
+                queryset = Task.objects.get_t(user, label)
+            except Exception as error:
+                testlog.warning(error)
+                queryset = []
+        else:
+            queryset = Task.objects.get_t(user)
+
+        return queryset
+
 class ProgressTaskView(ListAPIView):
     permission_classes = (IsAuthenticated, )
     authentication_classes = (SessionAuthentication, BasicAuthentication)

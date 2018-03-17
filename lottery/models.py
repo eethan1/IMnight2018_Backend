@@ -28,6 +28,42 @@ def is_task(task_label):
     else:
         return False
 
+class TaskManager(models.Manager):
+    
+    def get_t(self, user, task_label=None):
+        """
+        return activated task list with whether finish state array
+        """    
+        if task_label is not None:
+            tasks = Task.objects.filter(label=task_label)
+            if tasks is not None:
+                return tasks
+            else:
+                raise Exception(
+                    "this task label dosen't exist,  label=%s", task_label)
+        else:
+            #.exclude(category=3)
+            all_tasks = Task.objects.filter(activated=True)
+            own_tasks = ProgressTask.objects.filter(user=user)
+            states = []
+            all_list = []
+            own_list = []
+            all_ids = all_tasks.values('id')
+            own_ids = own_tasks.values('task__id')
+            for idd in all_ids:
+                all_list.append(idd['id'])
+            for idd in own_ids:
+                own_list.append(idd['task__id'])
+            for idd in all_list:
+                if idd in own_list:
+                    states.append(True)
+                else:
+                    states.append(False)
+            print(all_list)
+            print(own_list)
+            print(states)
+            all_tasks.states = states
+            return all_tasks
 
 class Task(models.Model):
     name = models.CharField(max_length=100)
@@ -39,7 +75,7 @@ class Task(models.Model):
         default=1, choices=TASK_CATEGORY_CHOICE)
     label = models.SlugField(unique=True, blank=True)
 
-    objects = models.manager
+    objects = TaskManager()
 
     class Meta:
         ordering = ['category', 'due_date', '-credit']
@@ -62,6 +98,7 @@ class Task(models.Model):
         super(Task, self).save(*args, **kwargs)
 
 
+
 class ProgressTaskManager(models.Manager):
     def get_progress_task(self, user, task_label=None):
         if task_label is not None:
@@ -72,7 +109,28 @@ class ProgressTaskManager(models.Manager):
                 raise Exception(
                     "this task label dosen't exist,  label=%s", task_label)
         else:
-            return ProgressTask.objects.filter(user=user)
+            #.exclude(category=3)
+            all_tasks = Task.objects.filter(activated=True)
+            own_tasks = ProgressTask.objects.filter(user=user)
+            states = []
+            all_list = []
+            own_list = []
+            all_ids = all_tasks.values('id')
+            own_ids = own_tasks.values('task__id')
+            for idd in all_ids:
+                all_list.append(idd['id'])
+            for idd in own_ids:
+                own_list.append(idd['task__id'])
+            for idd in all_list:
+                if idd in own_list:
+                    states.append(True)
+                else:
+                    states.append(False)
+            print(all_list)
+            print(own_list)
+            print(states)
+            # all_tasks.states = states
+            return all_tasks
 
     def finish_task_by_label(self, user, task_label):
         """
