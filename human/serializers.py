@@ -8,7 +8,7 @@ from human.models import Profile, Relationship
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ('nickname', 'job', 'job_description',
+        fields = ('job', 'job_description',
                   'img', 'bio', 'birth_date', 'point')
 
 
@@ -31,8 +31,6 @@ class UserDetailsSerializer(serializers.ModelSerializer):
             'last_name', instance.last_name)
 
         # update Profile and User sametime
-        instance.profile.nickname = profile_data.get(
-            'nickname', instance.profile.nickname)
         instance.profile.job = profile_data.get('job', instance.profile.job)
         instance.profile.bio = profile_data.get('bio', instance.profile.bio)
         instance.profile.birth_date = profile_data.get(
