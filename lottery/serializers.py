@@ -6,15 +6,25 @@ from human.serializers import UserDetailsSerializer
 from lottery.models import ProgressTask, Task
 
 
-class TaskSerializer(serializers.ModelSerializer):
-
+class SingleTaskSerializer(serializers.ModelSerializer):
+    """
+    with all fields, to access many task should use Tasks to prevent label field exposed
+    """
     class Meta:
         model = Task
         fields = '__all__'
 
+class TasksSerializer(serializers.ModelSerializer):
+    """
+    without label field
+    """
+    class Meta:
+        model = Task
+        fields = ('id', 'name', 'description', 'due_date', 'credit', 'activated', 'category')
+
 
 class ProgressTaskSerializer(serializers.ModelSerializer):
-    task = TaskSerializer(required=True, many=True)
+    task = SingleTaskSerializer(required=True, many=True)
     user = UserDetailsSerializer(required=True, many=True)
 
     class Meta:
