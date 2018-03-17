@@ -143,10 +143,10 @@ SOCIALACCOUNT_PROVIDERS = {
             'timezone',
             'link',
         ],
-        'EXCHANGE_TOKEN': True,
+        'EXCHANGE_TOKEN': False,
         'LOCALE_FUNC': lambda request: 'en_US',
         'VERIFIED_EMAIL': False,
-        'VERSION': 'v2.5',
+        'VERSION': 'v2.10',
     }
 }
 
