@@ -14,9 +14,9 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class ProgressTaskSerializer(serializers.ModelSerializer):
-    task = TaskSerializer(required=True)
-    user = UserDetailsSerializer(required=True)
+    task = TaskSerializer(required=True, many=True)
+    user = UserDetailsSerializer(required=True, many=True)
 
     class Meta:
         model = ProgressTask
-        fields = '__all__'
+        fields = ('user', 'task', 'last_active_date',)
