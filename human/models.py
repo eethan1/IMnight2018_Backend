@@ -100,7 +100,8 @@ class RelationshipManager(models.Manager):
         if daily_performer:
             if daily_performer.client == user:
                 # already draw daily performer
-                return daily_performer
+                print("draw")
+                return [daily_performer]
         else:
             # not yet draw daily performer
             own_performer_pk = [user.pk]
@@ -141,8 +142,11 @@ class RelationshipManager(models.Manager):
                     return Relationship.objects.none()
                 else:
                     # return objects must be iterable
-                    daily_performer = [daily_performer]
-                    return daily_performer
+                    try:
+                        Profile.objects.filter(user=user)[0].add_point(30)
+                    except Exception as error:
+                        testlog.warning(error)
+                    return [daily_performer]
 
     def check_daily(self, user):
         is_performer_drawn = False
