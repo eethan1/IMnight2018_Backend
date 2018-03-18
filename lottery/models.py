@@ -67,7 +67,7 @@ class Task(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(blank=True, max_length=500)
     due_date = models.DateTimeField(blank=False, null=False)
-    credit = models.PositiveIntegerField(default=0, blank=False, null=False)
+    credit = models.PositiveIntegerField(default=20, blank=False, null=False)
     activated = models.BooleanField(default=False)
     category = models.SmallIntegerField(
         default=1, choices=TASK_CATEGORY_CHOICE)
@@ -107,28 +107,7 @@ class ProgressTaskManager(models.Manager):
                 raise Exception(
                     "this task label dosen't exist,  label=%s", task_label)
         else:
-            #.exclude(category=3)
-            all_tasks = Task.objects.filter(activated=True)
-            own_tasks = ProgressTask.objects.filter(user=user)
-            states = []
-            all_list = []
-            own_list = []
-            all_ids = all_tasks.values('id')
-            own_ids = own_tasks.values('task__id')
-            for idd in all_ids:
-                all_list.append(idd['id'])
-            for idd in own_ids:
-                own_list.append(idd['task__id'])
-            for idd in all_list:
-                if idd in own_list:
-                    states.append(True)
-                else:
-                    states.append(False)
-            print(all_list)
-            print(own_list)
-            print(states)
-            # all_tasks.states = states
-            return all_tasks
+            return ProgressTask.objects.filter(user=user)
 
     def finish_task_by_label(self, user, task_label):
         """
@@ -142,7 +121,7 @@ class ProgressTaskManager(models.Manager):
             try:
                 obj, created = ProgressTask.objects.get_or_create(
                     user=user, task=task)
-                print(obj, created)
+                # print(obj, created)
             except Exception as error:
                 testlog.error(error)
 

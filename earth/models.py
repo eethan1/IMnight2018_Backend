@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 
+from human.models import Profile
 
 import datetime
 import random
@@ -134,6 +135,11 @@ class HoldingVocherManager(models.Manager):
                     testlog.warning(error)
                     return HoldingVocher.objects.none()
                 else:
+                    try:
+                        Profile.objects.filter(user=user)[0].add_point(30)
+                    except Exception as error:
+                        testlog.warning(error)
+                        return HoldingVocher.objects.none()
                     return [daily_vocher]
 
     def check_daily(self, user):
