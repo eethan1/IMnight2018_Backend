@@ -27,18 +27,20 @@ def get_tasks(request):
         label = request.data['label']
         try:
             queryset, states = Task.objects.get_tasks(user, label)
+            serializer = TasksSerializer(queryset, many=True)
         except Exception as error:
             testlog.warning(error)
             queryset = []
     else:
-        queryset, states = Task.objects.get_tasks(user)
-    serializer = TasksSerializer(queryset, many=True)
-    print(states)
+        try:
+            queryset, states = Task.objects.get_tasks(user)
+            serializer = TasksSerializer(queryset, many=True)
+        except Exception as error:
+            testlog.warning(error)
+            queryset = []
     serializer.data.append(states)
-    print(serializer.data)
-    resp = [serializer.data, states]
-    print(resp)
-    return Response(resp)
+    queryset = [serializer.data, states]
+    return Response(queryset)
 
 class ProgressTaskView(ListAPIView):
     permission_classes = (IsAuthenticated, )

@@ -36,9 +36,12 @@ class TaskManager(models.Manager):
         return activated task list with whether finish state array
         """    
         if task_label is not None:
-            tasks = Task.objects.filter(label=task_label)
-            if tasks is not None:
-                return (tasks, [])
+            all_tasks = Task.objects.filter(label=task_label).filter(activated=True)
+            own_tasks = ProgressTask.objects.filter(user=user).filter(task__label=task_label)
+            if own_tasks is not None:
+                return (all_tasks, [True for i in range(all_tasks.count())])
+            elif all_tasks is not None:
+                return (all_tasks, [False for i in range(all_tasks.count())])
             else:
                 raise Exception(
                     "this task label dosen't exist,  label=%s", task_label)
