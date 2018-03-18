@@ -25,6 +25,7 @@ class Profile(models.Model):
     point = models.PositiveIntegerField(default=0, blank=False, null=False)
     img = models.URLField(
         default="https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Default_profile_picture_%28male%29_on_Facebook.jpg/600px-Default_profile_picture_%28male%29_on_Facebook.jpg")
+    isReadTutorial = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
@@ -37,9 +38,6 @@ class Profile(models.Model):
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
-    # clinets_group = Group.objects.get(name='Clients')
-    clinets_group = Group.objects.get(name='Clients')
-    print(instance.groups.add(clinets_group))
     if created:
         Profile.objects.create(user=instance)
 
