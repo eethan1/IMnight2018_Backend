@@ -149,7 +149,8 @@ class Store(models.Model):
         blank=False, default="https://i.imgur.com/67A5cyq.jpg")
     bg_url = models.URLField(
         blank=False, default="https://i.imgur.com/67A5cyq.jpg")
-
+    show = models.BooleanField(null=False, default=True)
+    
     def __str__(self):
         return self.title
 

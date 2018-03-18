@@ -7,6 +7,7 @@ from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 
+from collections import OrderedDict
 import datetime
 import random
 import hashlib
@@ -30,40 +31,37 @@ def is_task(task_label):
 
 class TaskManager(models.Manager):
     
-    def get_t(self, user, task_label=None):
+    def get_tasks(self, user, task_label=None):
         """
         return activated task list with whether finish state array
         """    
         if task_label is not None:
-            tasks = Task.objects.filter(label=task_label)
-            if tasks is not None:
-                return tasks
+            all_tasks = Task.objects.filter(label=task_label).filter(activated=True)
+            own_tasks = ProgressTask.objects.filter(user=user).filter(task__label=task_label)
+            if own_tasks is not None:
+                return (all_tasks, [True for i in range(all_tasks.count())])
+            elif all_tasks is not None:
+                return (all_tasks, [False for i in range(all_tasks.count())])
             else:
                 raise Exception(
                     "this task label dosen't exist,  label=%s", task_label)
         else:
             #.exclude(category=3)
-            all_tasks = Task.objects.filter(activated=True)
-            own_tasks = ProgressTask.objects.filter(user=user)
+            all_tasks = Task.objects.filter(activated=True).values()
+            own_tasks = ProgressTask.objects.filter(user=user).values('task__id')
             states = []
-            all_list = []
             own_list = []
-            all_ids = all_tasks.values('id')
-            own_ids = own_tasks.values('task__id')
-            for idd in all_ids:
-                all_list.append(idd['id'])
-            for idd in own_ids:
-                own_list.append(idd['task__id'])
-            for idd in all_list:
-                if idd in own_list:
+            # for idd in all_ids:
+            #     all_list.append(idd['id'])
+            for task in own_tasks:
+                own_list.append(task['task__id'])
+            for task in all_tasks:
+                if task['id'] in own_list:
                     states.append(True)
                 else:
                     states.append(False)
-            print(all_list)
-            print(own_list)
-            print(states)
-            all_tasks.states = states
-            return all_tasks
+            states = OrderedDict({'states':states})            
+            return (all_tasks, states)
 
 class Task(models.Model):
     name = models.CharField(max_length=100)

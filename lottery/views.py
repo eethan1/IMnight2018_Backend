@@ -6,35 +6,41 @@ from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView, ListA
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import api_view, authentication_classes, permission_classes, renderer_classes
 from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
 
 from lottery.models import Task, ProgressTask
-from lottery.serializers import ProgressTaskSerializer, TaskSerializer
+from lottery.serializers import ProgressTaskSerializer, SingleTaskSerializer, TasksSerializer
 
 import logging
 testlog = logging.getLogger('testdevelop')
 
+@api_view(['GET'])
+@renderer_classes((JSONRenderer,))
+@authentication_classes((SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def get_tasks(request):
+    user = request.user
 
-class TaskView(ListAPIView):
-    permission_classes = (IsAuthenticated, )
-    authentication_classes = (SessionAuthentication, BasicAuthentication)
-    serializer_class = TaskSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-
-        if 'label' in self.kwargs:
-            label = self.kwargs['label']
-            try:
-                queryset = Task.objects.get_t(user, label)
-            except Exception as error:
-                testlog.warning(error)
-                queryset = []
-        else:
-            queryset = Task.objects.get_t(user)
-
-        return queryset
+    if 'label' in request.data:
+        label = request.data['label']
+        try:
+            queryset, states = Task.objects.get_tasks(user, label)
+            serializer = TasksSerializer(queryset, many=True)
+        except Exception as error:
+            testlog.warning(error)
+            queryset = []
+    else:
+        try:
+            queryset, states = Task.objects.get_tasks(user)
+            serializer = TasksSerializer(queryset, many=True)
+        except Exception as error:
+            testlog.warning(error)
+            queryset = []
+    serializer.data.append(states)
+    queryset = [serializer.data, states]
+    return Response(queryset)
 
 class ProgressTaskView(ListAPIView):
     permission_classes = (IsAuthenticated, )
@@ -67,7 +73,7 @@ def finish_task(request):
             finished_task = ProgressTask.objects.finish_task_by_label(
                 request.user, request.data['label'])
             if finished_task:
-                serializer = TaskSerializer(finished_task)
+                serializer = SingleTaskSerializer(finished_task)
                 return Response(serializer.data)
             else:
                 return Response({"message": "Task already finished or closed"},
