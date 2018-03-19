@@ -24,8 +24,8 @@ class TasksSerializer(serializers.ModelSerializer):
 
 
 class ProgressTaskSerializer(serializers.ModelSerializer):
-    task = SingleTaskSerializer(required=True, many=True)
-    user = UserDetailsSerializer(required=True, many=True)
+    task = SingleTaskSerializer(required=True)
+    user = UserDetailsSerializer(required=True)
 
     class Meta:
         model = ProgressTask
