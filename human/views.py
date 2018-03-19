@@ -2,6 +2,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+from django.http import HttpResponseRedirect
+from django import forms
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 from rest_framework import status
 from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView, ListAPIView
@@ -14,7 +18,7 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.response import Response
 import coreapi
 
-from human.models import Relationship
+from human.models import Relationship, Profile
 from human.serializers import UserDetailsSerializer, RelationshipSerializer
 
 import logging
@@ -109,3 +113,20 @@ class DailyPerformerView(ListAPIView):
 
         queryset = Relationship.objects.get_daily(user)
         return queryset
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['job', 'job_description', 'bio', 'img']
+
+@login_required
+def performer_profile(request):
+    if request.method == 'POST':
+        form = ProfileForm(data=request.POST, instance=request.user.profile)
+        if form.is_valid():
+            form = form.save()
+            return HttpResponseRedirect('/article/' + str(new_article.pk))
+
+    form = ProfileForm(instance=request.user.profile)
+    return render(request, 'performer_profile.html', {'form': form})
