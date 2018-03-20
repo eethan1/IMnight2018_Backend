@@ -121,7 +121,7 @@ class ProgressTaskManager(models.Manager):
             if task.due_date < timezone.now():
                 # task 已經過期
                 return False
-            if task.activated = False:
+            if task.activated == False:
                 # task 還沒被激活
                 return False
             try:
