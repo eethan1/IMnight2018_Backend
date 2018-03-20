@@ -135,8 +135,8 @@ class ProgressTaskManager(models.Manager):
                 user.profile.add_point(task.credit)
                 return task
             else:
-                if task.category == 2:
-                    # 限時任務只能被做一次
+                if task.category != 1:
+                    # 除了每日任務以外都不能重複做
                     return False
 
                 if obj.last_active_date.date() != datetime.datetime.today().date():
