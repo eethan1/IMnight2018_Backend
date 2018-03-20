@@ -30,11 +30,11 @@ def is_task(task_label):
         return False
 
 class TaskManager(models.Manager):
-    
+
     def get_tasks(self, user, task_label=None):
         """
         return activated task list with whether finish state array
-        """    
+        """
         if task_label is not None:
             all_tasks = Task.objects.filter(label=task_label).filter(activated=True)
             own_tasks = ProgressTask.objects.filter(user=user).filter(task__label=task_label)
@@ -60,7 +60,7 @@ class TaskManager(models.Manager):
                     states.append(True)
                 else:
                     states.append(False)
-            states = OrderedDict({'states':states})            
+            states = OrderedDict({'states':states})
             return (all_tasks, states)
 
 class Task(models.Model):
@@ -116,7 +116,13 @@ class ProgressTaskManager(models.Manager):
         task = Task.objects.filter(label=task_label).first()
 
         if task:
+        # 有這個task label存在
+
             if task.due_date < timezone.now():
+                # task 已經過期
+                return False
+            if task.activated = False:
+                # task 還沒被激活
                 return False
             try:
                 obj, created = ProgressTask.objects.get_or_create(
@@ -129,9 +135,13 @@ class ProgressTaskManager(models.Manager):
                 user.profile.add_point(task.credit)
                 return task
             else:
-                if task.category != 1:
+                if task.category == 2:
+                    # 限時任務只能被做一次
                     return False
+
                 if obj.last_active_date.date() != datetime.datetime.today().date():
+                    # 是每日任務或彩蛋
+                    # 今天還沒有做過
                     user.profile.add_point(task.credit)
                     obj.last_active_date = datetime.datetime.today()
                     obj.save()
