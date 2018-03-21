@@ -64,6 +64,18 @@ class ProgressTaskView(ListAPIView):
         return queryset
 
 
+@api_view(['GET'])
+@authentication_classes((SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def check_task(request, label):
+    try:
+        is_task_available = ProgressTask.objects.check_task_availabel(request.user, label)
+        return Response({"is_task_available" : is_task_available})
+
+    except Exception as error:
+        return Response({"message": "error"},
+                        status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(['POST'])
 @authentication_classes((SessionAuthentication, BasicAuthentication))
 @permission_classes((IsAuthenticated,))
@@ -80,7 +92,6 @@ def finish_task(request):
                                 status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as error:
-            print (error)
             return Response({"message": "error"},
                             status=status.HTTP_400_BAD_REQUEST)
 

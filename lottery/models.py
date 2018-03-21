@@ -109,6 +109,41 @@ class ProgressTaskManager(models.Manager):
         else:
             return ProgressTask.objects.filter(user=user)
 
+    def check_task_availabel(self, user, task_label):
+        """
+        if finish successlly return task.credit, otherwise return 0.
+        """
+        task = Task.objects.filter(label=task_label).first()
+
+        if task:
+        # 有這個task label存在
+
+            if task.due_date < timezone.now():
+                # task 已經過期
+                return False
+            if task.activated == False:
+                # task 還沒被激活
+                return False
+            if task.category != 1:
+                # 除了每日任務以外都不能重複做
+                return False
+
+            try:
+                obj = ProgressTask.objects.get(
+                    user=user, task=task)
+
+            except Exception as error:
+                testlog.error(error)
+
+            if obj:
+                if obj.last_active_date.date() != datetime.datetime.today().date():
+                    # 是每日任務
+                    # 今天還沒有做過
+                    return True
+        else:
+            return False
+
+
     def finish_task_by_label(self, user, task_label):
         """
         if finish successlly return task.credit, otherwise return 0.
