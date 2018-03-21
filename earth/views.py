@@ -89,10 +89,8 @@ class ListStoreView(ListAPIView):
     serializer_class = StoreSerializer
 
     def get_queryset(self):
-        show = self.request.query_params.get_queryset('show', None)
-        queryset = []
-        if show is None:
-            queryset = Store.objects.all()
-        else:
-            queryset = Store.objects.filter(show=show)
+        queryset = Store.objects.all()
+        show = self.request.query_params.get('show', None)
+        if show is not None:
+            queryset = queryset.filter(show=show)
         return queryset
