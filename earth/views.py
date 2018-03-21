@@ -82,7 +82,8 @@ class ListVocherView(ListAPIView):
 
 class ListStoreView(ListAPIView):
     """
-    取得所有的store
+    取得所有的store資訊
+    可以加?show={True,False}來篩選是不是要顯示的店家
     """
     permission_classes = (AllowAny,)
     authentication_classes = (SessionAuthentication, BasicAuthentication)
