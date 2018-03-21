@@ -177,7 +177,7 @@ class ProgressTaskManager(models.Manager):
                     return False
 
                 if obj.last_active_date.date() != datetime.datetime.today().date():
-                    # 是每日任務或彩蛋
+                    # 是每日任務
                     # 今天還沒有做過
                     user.profile.add_point(task.credit)
                     obj.last_active_date = datetime.datetime.today()
