@@ -13,6 +13,7 @@ class CourseListSerializer(serializers.ModelSerializer):
 
 
 class CourseSerializer(serializers.ModelSerializer):
+    task = SingleTaskSerializer(required=True)
 
     class Meta:
         model = Course
