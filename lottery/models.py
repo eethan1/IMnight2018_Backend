@@ -117,20 +117,16 @@ class ProgressTaskManager(models.Manager):
 
         if task:
         # 有這個task label存在
-
             if task.due_date < timezone.now():
                 # task 已經過期
                 return False
             if task.activated == False:
                 # task 還沒被激活
                 return False
-            if task.category != 1:
-                # 除了每日任務以外都不能重複做
-                return False
 
             try:
                 # 找出之前有沒有做過這個任務
-                obj = ProgressTask.objects.get(
+                obj = ProgressTask.objects.filter(
                     user=user, task=task)
 
             except Exception as error:
@@ -138,10 +134,20 @@ class ProgressTaskManager(models.Manager):
 
             if obj:
                 # 之前有做過
+                if task.category != 1:
+                    # 除了每日任務以外都不能重複做
+                    return False
+
+                obj = obj.first()
                 if obj.last_active_date.date() != datetime.datetime.today().date():
                     # 是每日任務
                     # 今天還沒有做過
                     return True
+            else:
+                # 之前沒有做過
+                # 可以做
+                return True
+
         else:
             return False
 
