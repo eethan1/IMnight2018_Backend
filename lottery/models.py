@@ -129,6 +129,7 @@ class ProgressTaskManager(models.Manager):
                 return False
 
             try:
+                # 找出之前有沒有做過這個任務
                 obj = ProgressTask.objects.get(
                     user=user, task=task)
 
@@ -136,6 +137,7 @@ class ProgressTaskManager(models.Manager):
                 testlog.error(error)
 
             if obj:
+                # 之前有做過
                 if obj.last_active_date.date() != datetime.datetime.today().date():
                     # 是每日任務
                     # 今天還沒有做過
