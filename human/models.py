@@ -1,20 +1,18 @@
+import datetime
+import hashlib
+import logging
+import random
+
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.text import slugify
-from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator
-from django.contrib.auth.models import Group
-from django.db.models import Q
 
-
-import datetime
-import random
-import hashlib
-import logging
-testlog = logging.getLogger('testdevelop')
+log = logging.getLogger('syslogger')
 
 
 class Profile(models.Model):
@@ -84,85 +82,32 @@ class RelationshipManager(models.Manager):
         clients = Relationship.objects.filter(performer=user)
         return clients
 
-    def get_daily(self, user):
-        # if is_performer(user):
-        #     raise ValidationError(
-        #         "You can't get daily_performer from a performer")
-
+    def is_performer_drawn(self, user):
         try:
-            daily_performer = Relationship.objects.filter(
-                Q(client=user) | Q(performer=user)).filter(created__date=datetime.date.today()).first()
+            # 篩選使用者今天所建立的relationship
+            # 有可能是自己抽的（user會在client欄位）
+            # 有可能是被抽的（user會在performer欄位）
+            daily_relationship = Relationship.objects.filter(
+                Q(client=user) | Q(performer=user)).filter(
+                created__date=datetime.date.today())
         except Exception as error:
-            testlog.error(error)
-            return Relationship.objects.none()
+            log.error("query今天建立的relationship的時候發生錯誤: %s" % error)
+            return (False, None)
 
-        if daily_performer:
-            if daily_performer.client == user:
-                # already draw daily performer
-                print("draw")
-                return [daily_performer]
-        else:
-            # not yet draw daily performer
-            own_performer_pk = [user.pk]
-            own_relationship = Relationship.objects.filter(client=user)
-            for relationship in own_relationship:
-                own_performer_pk.append(relationship.performer.pk)
-            own_relationship = Relationship.objects.filter(performer=user)
-            for relationship in own_relationship:
-                own_performer_pk.append(relationship.client.pk)
+        if len(daily_relationship) > 0:
+            # 今天有relationship建立
 
-            try:
-                all_performers = User.objects.filter(
-                    groups__name__exact="Performers").exclude(pk__in=own_performer_pk)
-            except Exception as error:
-                testlog.error(error)
-                all_performers = []
+            if len(daily_relationship) > 2:
+                log.error("%s 今天有超過2個relationship被建立" % user.username)
 
-            """random choice a performer and return"""
-            num = len(all_performers)
-            # check if already draw all performers
-            if num <= 0:
-                # all performer are draw
-                return Relationship.objects.none()
+            for relationship in daily_relationship:
+                if relationship.client == user:
+                    # 使用者今天已經抽過卡
+                    return (True, relationship)
 
-            else:
-                index = random.randint(0, num - 1)
-                performer = all_performers[index]
-
-                try:
-                    daily_performer = self.create(
-                        client=user, performer=performer)
-                    daily_performer.save()
-                except ValidationError as error:
-                    testlog.error(error)
-                    return Relationship.objects.none()
-                except Exception as error:
-                    testlog.warning(error)
-                    return Relationship.objects.none()
-                else:
-                    # return objects must be iterable
-                    try:
-                        Profile.objects.filter(user=user)[0].add_point(30)
-                    except Exception as error:
-                        testlog.warning(error)
-                    return [daily_performer]
-
-    def check_daily(self, user):
-        is_performer_drawn = False
-        is_all_drawn = False
-        try:
-            daily_performer = Relationship.objects.filter(
-                Q(client=user) | Q(performer=user)).filter(created__date=datetime.date.today()).first()
-        except Exception as error:
-            testlog.error(error)
-            return (is_performer_drawn, is_all_drawn)
-
-        if daily_performer:
-            # because if you draw the card, you will always in the client field
-            if daily_performer.client == user:
-                # already draw daily performer
-                is_performer_drawn = True
-
+    def is_all_drawn(self, user):
+        # 今天還沒有抽過資管人
+        # own_performer_pk 是已經擁有關係的資管人名單
         own_performer_pk = [user.pk]
         own_relationship = Relationship.objects.filter(client=user)
         for relationship in own_relationship:
@@ -172,14 +117,60 @@ class RelationshipManager(models.Manager):
             own_performer_pk.append(relationship.client.pk)
 
         try:
-            all_performers = User.objects.filter(
+            # available_performers 是還可以抽的資管人名單
+            available_performers = User.objects.filter(
                 groups__name__exact="Performers").exclude(pk__in=own_performer_pk)
         except Exception as error:
-            testlog.error(error)
-            return (is_performer_drawn, is_all_drawn)
+            log.error("query還可以抽的資管人名單的時候發生錯誤: %s" % error)
+            return (True, None)
 
-        if len(all_performers) == 0:
-            is_all_drawn = True
+        # 隨機抽資管人
+        num = len(available_performers)
+        if num <= 0:
+            # 所有的資管人都已經抽完
+            # 或是別的資管人都抽到你（在user也是資管人的情況下）
+            return (True, None)
+        else:
+            return (False, available_performers)
+
+    def get_daily(self, user):
+        (is_performer_drawn, relationship) = self.is_performer_drawn(user)
+
+        if is_performer_drawn:
+            # 今天已經抽過資管人
+            return [relationship]
+
+        else:
+            (is_all_drawn, available_performers) = self.is_all_drawn(user)
+
+            if is_all_drawn:
+                # 已經抽完全部資管人
+                # 或是被抽完（當user是資管人）
+                return Relationship.objects.none()
+            else:
+                # 隨機抽資管人
+                num = len(available_performers)
+                index = random.randint(0, num - 1)
+                performer = available_performers[index]
+
+                try:
+                    daily_performer = self.create(
+                        client=user, performer=performer)
+                    daily_performer.save()
+                    # 抽卡預設加30點
+                    user.profile.add_point(30)
+                except Exception as error:
+                    log.error("建立新的relationship的時候發生錯誤: %s" % error)
+                    return Relationship.objects.none()
+
+                # return objects must be iterable
+                return [daily_performer]
+
+    def check_daily(self, user):
+        # 檢查今天是否抽過資管人
+        (is_performer_drawn, relationship) = self.is_performer_drawn(user)
+        # 檢查是否已經抽完全部的資管人
+        (is_all_drawn, available_performers) = self.is_all_drawn(user)
 
         return (is_performer_drawn, is_all_drawn)
 
@@ -197,8 +188,6 @@ class Relationship(models.Model):
     objects = RelationshipManager()
 
     class Meta:
-        verbose_name = 'Relationship'
-        verbose_name_plural = 'My Relationships'
         unique_together = ('client', 'performer')
         ordering = ['client', 'performer', '-created']
 
@@ -206,14 +195,9 @@ class Relationship(models.Model):
         return "Client \"%s\" Performer \"%s\"" % (self.client.username, self.performer.username)
 
     def save(self, *args, **kwargs):
-        # Some identity check for the User
-        # if not is_client(self.client):
-        #     raise ValidationError("self.client is not in Clients Group")
-        # if not is_performer(self.performer):
-        #     raise ValidationError("self.performer is not in Performers Group")
         if self.client == self.performer:
-            raise ValidationError(
-                "self.client and slef.performer can't be same person")
+            log.error("嘗試建立performer == client 的 Relationship( %s )" %
+                      self.client)
 
         # create unique label used for chatroom
         hashkey = self.client.username + \
@@ -223,7 +207,7 @@ class Relationship(models.Model):
         try:
             self.label = relationship_label
         except Exception as error:
-            testlog.error(error)
+            log.error(error)
             relationship_label = hash(hashkey**2) % (10 ** 20)
             relationship_label = slugify(relationship_label)
             self.label = relationship_label
