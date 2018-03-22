@@ -18,7 +18,7 @@ from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-testlog = logging.getLogger('testdevelop')
+log = logging.getLogger('syslogger')
 
 UserModel = get_user_model()
 
@@ -79,10 +79,9 @@ class RelationshipDetailsView(ListAPIView):
             queryset = Relationship.objects.filter(
                 Q(client=user) | Q(performer=user))
 
-        except ValidationError as error:
-            testlog.error(error)
         except Exception as error:
-            testlog.warning(error)
+            log.warning("query %s Relationship發生錯誤: %s" %
+                        (user.username, error))
         else:
             for relationship in queryset:
                 if relationship.performer == user:

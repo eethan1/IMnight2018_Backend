@@ -1,21 +1,17 @@
-from django.contrib.auth.models import User
-
-from channels.generic.websocket import WebsocketConsumer, JsonWebsocketConsumer
-
-from asgiref.sync import async_to_sync
-
-from rest_framework.renderers import JSONRenderer
-
-from human.models import Relationship
-from human.chat.models import Message
-from human.chat.serializers import MessageSerializer
-
-
-import re
 import json
 import logging
+import re
 
-testlog = logging.getLogger('testdevelop')
+from asgiref.sync import async_to_sync
+from channels.generic.websocket import JsonWebsocketConsumer, WebsocketConsumer
+from django.contrib.auth.models import User
+
+from human.chat.models import Message
+from human.chat.serializers import MessageSerializer
+from human.models import Relationship
+from rest_framework.renderers import JSONRenderer
+
+log = logging.getLogger('syslogger')
 
 
 class ChatConsumer(JsonWebsocketConsumer):
@@ -32,15 +28,16 @@ class ChatConsumer(JsonWebsocketConsumer):
         try:
             room = Relationship.objects.get(label=label)
         except Relationship.DoesNotExist:
-            testlog.error('No relationship have this label=%s', label)
+            log.warning('No relationship have this label=%s', label)
             self.close()
             return
         except Exception as error:
+            log.error("建立聊天室channel時發生錯誤: %s" % error)
             self.close()
             return
 
         if not (room.client == self.user or room.performer == self.user):
-            testlog.warning(
+            log.warning(
                 '%s try to connect to the relationship that not belog to him', self.user)
             self.close()
             return
@@ -78,7 +75,7 @@ class ChatConsumer(JsonWebsocketConsumer):
                 )
 
         else:
-            testlog.warning(
+            log.warning(
                 "message data send by ws is NULL, full message: \n%s", content)
 
     def chat_message(self, event):
