@@ -1,27 +1,23 @@
+import logging
+
+from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.http import HttpResponseRedirect
-from django import forms
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 
+from human.models import Profile, Relationship
+from human.serializers import RelationshipSerializer, UserDetailsSerializer
 from rest_framework import status
-from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView, ListAPIView
-from rest_framework.views import APIView
+from rest_framework.authentication import (BasicAuthentication,
+                                           SessionAuthentication)
+from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.schemas import AutoSchema
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
-from rest_framework.response import Response
-import coreapi
 
-from human.models import Relationship, Profile
-from human.serializers import UserDetailsSerializer, RelationshipSerializer
-
-import logging
 testlog = logging.getLogger('testdevelop')
 
 UserModel = get_user_model()
@@ -120,13 +116,14 @@ class ProfileForm(forms.ModelForm):
         model = Profile
         fields = ['job', 'job_description', 'bio', 'img']
 
+
 @login_required
 def performer_profile(request):
     if request.method == 'POST':
         form = ProfileForm(data=request.POST, instance=request.user.profile)
         if form.is_valid():
             form = form.save()
-            return HttpResponseRedirect('/article/' + str(new_article.pk))
+            return HttpResponseRedirect('https://ntu.im/night/2018/view/template.html')
 
     form = ProfileForm(instance=request.user.profile)
     return render(request, 'performer_profile.html', {'form': form})
