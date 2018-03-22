@@ -275,10 +275,17 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
+        'syslog': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.SysLogHandler',
+            'facility': 'local7',
+            'address': '/dev/log',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
-        'testdevelop': {
-            'handlers': ['console', ],
+        'syslogger': {
+            'handlers': ['console', 'syslog'],
         },
     },
     'filters': {
