@@ -3,6 +3,10 @@ import os
 import sys
 
 if __name__ == "__main__":
+    if not os.path.exists('debug.log'):
+        with open('debug.log', 'w'):
+            pass
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "IMnight.im_settings")
     try:
         from django.core.management import execute_from_command_line
