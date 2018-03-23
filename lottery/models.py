@@ -1,17 +1,18 @@
+import datetime
+import hashlib
+import logging
+import random
+from collections import OrderedDict
+
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.text import slugify
-from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator
 
-from collections import OrderedDict
-import datetime
-import random
-import hashlib
-import logging
 testlog = logging.getLogger('testdevelop')
 
 TASK_CATEGORY_CHOICE = (
@@ -29,6 +30,7 @@ def is_task(task_label):
     else:
         return False
 
+
 class TaskManager(models.Manager):
 
     def get_tasks(self, user, task_label=None):
@@ -36,8 +38,10 @@ class TaskManager(models.Manager):
         return activated task list with whether finish state array
         """
         if task_label is not None:
-            all_tasks = Task.objects.filter(label=task_label).filter(activated=True)
-            own_tasks = ProgressTask.objects.filter(user=user).filter(task__label=task_label)
+            all_tasks = Task.objects.filter(
+                label=task_label).filter(activated=True)
+            own_tasks = ProgressTask.objects.filter(
+                user=user).filter(task__label=task_label)
             if own_tasks is not None:
                 return (all_tasks, [True for i in range(all_tasks.count())])
             elif all_tasks is not None:
@@ -48,7 +52,8 @@ class TaskManager(models.Manager):
         else:
             #.exclude(category=3)
             all_tasks = Task.objects.filter(activated=True).values()
-            own_tasks = ProgressTask.objects.filter(user=user).values('task__id')
+            own_tasks = ProgressTask.objects.filter(
+                user=user).values('task__id')
             states = []
             own_list = []
             # for idd in all_ids:
@@ -60,8 +65,9 @@ class TaskManager(models.Manager):
                     states.append(True)
                 else:
                     states.append(False)
-            states = OrderedDict({'states':states})
+            states = OrderedDict({'states': states})
             return (all_tasks, states)
+
 
 class Task(models.Model):
     name = models.CharField(max_length=100)
@@ -79,7 +85,7 @@ class Task(models.Model):
         ordering = ['category', 'due_date', '-credit']
 
     def __str__(self):
-        return "%s [%s] have %d credit, due in %s, label:%s" % (self.name, TASK_CATEGORY_CHOICE[self.category-1][1], self.credit, self.due_date, self.label)
+        return "%s : %d credit, label:%s" % (self.name, self.credit, self.label)
 
     def save(self, *args, **kwargs):
         hashkey = self.name + str(self.due_date)
@@ -94,7 +100,6 @@ class Task(models.Model):
             self.label = task_label
 
         super(Task, self).save(*args, **kwargs)
-
 
 
 class ProgressTaskManager(models.Manager):
@@ -116,7 +121,7 @@ class ProgressTaskManager(models.Manager):
         task = Task.objects.filter(label=task_label).first()
 
         if task:
-        # 有這個task label存在
+            # 有這個task label存在
             if task.due_date < timezone.now():
                 # task 已經過期
                 return False
@@ -151,7 +156,6 @@ class ProgressTaskManager(models.Manager):
         else:
             return False
 
-
     def finish_task_by_label(self, user, task_label):
         """
         if finish successlly return task.credit, otherwise return 0.
@@ -159,7 +163,7 @@ class ProgressTaskManager(models.Manager):
         task = Task.objects.filter(label=task_label).first()
 
         if task:
-        # 有這個task label存在
+            # 有這個task label存在
 
             if task.due_date < timezone.now():
                 # task 已經過期
