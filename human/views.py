@@ -122,7 +122,7 @@ def performer_profile(request):
         form = ProfileForm(data=request.POST, instance=request.user.profile)
         if form.is_valid():
             form = form.save()
-            return HttpResponseRedirect('https://ntu.im/night/2018/')
+            return HttpResponseRedirect('https://ntu.im/night/2018/home.html')
 
     form = ProfileForm(instance=request.user.profile)
     return render(request, 'performer_profile.html', {'form': form})

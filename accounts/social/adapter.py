@@ -7,19 +7,19 @@ from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 
 class MyAccountAdapter(DefaultAccountAdapter):
     def get_login_redirect_url(self, request):
-        path = "https://ntu.im/night/2018/"
+        path = "https://ntu.im/night/2018/home.html"
         # return path.format(username=request.user.username)
         return path
 
     def get_logout_redirect_url(self, request):
-        path = "https://ntu.im/night/2018/"
+        path = "https://ntu.im/night/2018/home.html"
         # return path.format(username=request.user.username)
         return path
 
 
 class MySocialAccountAdapter(DefaultSocialAccountAdapter):
     def get_connect_redirect_url(self, request, socialaccount):
-        path = "https://ntu.im/night/2018/"
+        path = "https://ntu.im/night/2018/home.html"
         # return path.format(username=request.user.username)
         return path
 
