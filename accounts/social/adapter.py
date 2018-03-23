@@ -41,6 +41,6 @@ def social_login(sociallogin, user, **kwargs):
     if sociallogin.account.provider == 'facebook':
         picture_url = "https://graph.facebook.com/{0}/picture?width={1}&height={1}".format(
             sociallogin.account.uid, preferred_avatar_size_pixels)
-        user.username = sociallogin.account.extra_data['name']
+        # user.username = sociallogin.account.extra_data['name']
         user.profile.img = picture_url
         user.save()
