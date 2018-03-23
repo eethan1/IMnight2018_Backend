@@ -4,7 +4,7 @@ from .settings import *
 STATIC_URL = '/static/IMnight/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = (
     'night2018.ntu.im',
@@ -34,4 +34,4 @@ ALLOWED_HOSTS = ['testbackend.ntu.im',
                  'imnight2018backend.ntu.im']
 
 # Turn off DEBUG mode.
-#DEBUG = False
+DEBUG = False
