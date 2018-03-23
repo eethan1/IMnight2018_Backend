@@ -105,6 +105,9 @@ class RelationshipManager(models.Manager):
                     # 使用者今天已經抽過卡
                     return (True, relationship)
 
+        # 使用者今天還沒抽過卡
+        return (False, None)
+
     def is_all_drawn(self, user):
         # 今天還沒有抽過資管人
         # own_performer_pk 是已經擁有關係的資管人名單
