@@ -1,26 +1,25 @@
 from django.dispatch import receiver
 
 from allauth.account.adapter import DefaultAccountAdapter
+from allauth.account.signals import user_logged_in, user_signed_up
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
-
-from allauth.account.signals import user_signed_up, user_logged_in
 
 
 class MyAccountAdapter(DefaultAccountAdapter):
     def get_login_redirect_url(self, request):
-        path = "https://ntu.im/night/2018/view/template.html"
+        path = "https://ntu.im/night/2018/"
         # return path.format(username=request.user.username)
         return path
 
     def get_logout_redirect_url(self, request):
-        path = "https://ntu.im/night/2018/view/homepage.html"
+        path = "https://ntu.im/night/2018/"
         # return path.format(username=request.user.username)
         return path
 
 
 class MySocialAccountAdapter(DefaultSocialAccountAdapter):
     def get_connect_redirect_url(self, request, socialaccount):
-        path = "https://ntu.im/night/2018/view/template.html"
+        path = "https://ntu.im/night/2018/"
         # return path.format(username=request.user.username)
         return path
 
