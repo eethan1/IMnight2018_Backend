@@ -156,6 +156,8 @@ class ProgressTaskManager(models.Manager):
         else:
             return False
 
+        return False
+
     def finish_task_by_label(self, user, task_label):
         """
         if finish successlly return task.credit, otherwise return 0.
