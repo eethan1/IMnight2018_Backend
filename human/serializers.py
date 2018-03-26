@@ -1,8 +1,7 @@
 from django.contrib.auth.models import User
 
-from rest_framework import serializers
-
 from human.models import Profile, Relationship
+from rest_framework import serializers
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -43,9 +42,15 @@ class UserDetailsSerializer(serializers.ModelSerializer):
 class RelationshipSerializer(serializers.ModelSerializer):
     # client = UserDetailsSerializer(required=True)
     performer = UserDetailsSerializer(required=True)
+    # 取得未讀的 message
+    unread_msg_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Relationship
 
-        fields = ('performer', 'label', 'created')
+        fields = ('performer', 'label', 'created', 'unread_msg_count')
         # fields = '__all__'
+
+    def get_unread_msg_count(self, obj):
+        # Message Model的ForeignKey的related_name='messages'
+        return obj.messages.filter(readed=False).count()
