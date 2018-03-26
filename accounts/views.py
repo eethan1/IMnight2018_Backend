@@ -1,27 +1,18 @@
-from django.contrib.auth import (
-    login as django_login,
-    logout as django_logout
-)
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.core.exceptions import ObjectDoesNotExist
+import logging
+
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.debug import sensitive_post_parameters
-from django.contrib.auth.models import AnonymousUser
 
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
-from rest_framework import status
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-
-
-from human.models import Relationship
 from earth.models import HoldingVocher
+from human.models import Relationship
+from rest_framework.authentication import (BasicAuthentication,
+                                           SessionAuthentication)
+from rest_framework.decorators import (api_view, authentication_classes,
+                                       permission_classes)
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+
+log = logging.getLogger('syslogger')
 
 sensitive_post_parameters_m = method_decorator(
     sensitive_post_parameters(

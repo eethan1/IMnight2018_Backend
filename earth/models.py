@@ -1,27 +1,32 @@
+import datetime
+import logging
+import random
+
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
-from django.core.exceptions import ValidationError
 
 from human.models import Profile
 
-import datetime
-import random
-import logging
-testlog = logging.getLogger('testdevelop')
+log = logging.getLogger('syslogger')
 
 
 class HoldingVocherManager(models.Manager):
     def used_vocher(self, user, label):
-        holdingVochers = HoldingVocher.objects.filter(
-            user=user).filter(label=label)
+        try:
+            holdingVochers = HoldingVocher.objects.filter(
+                user=user).filter(label=label)
+        except Exception as error:
+            log.error("Error while user %s qurying HoldingVocher %s"
+                      (user, label))
         for vocher in holdingVochers:
             try:
                 vocher.used()
                 return True
-            except BaseException as error:
-                testlog.error(error)
+            except Exception as error:
+                log.error("Error while using %s voucher: %s" % (label, error))
 
         return False
 
@@ -29,7 +34,8 @@ class HoldingVocherManager(models.Manager):
         try:
             holdingVochers = HoldingVocher.objects.filter(user=user)
         except Exception as error:
-            testlog.error(error)
+            log.error("Error while user %s qurying HoldingVocher: %s" %
+                      (user, error))
             return HoldingVocher.objects.none()
         else:
             if storename is not None:
@@ -45,7 +51,7 @@ class HoldingVocherManager(models.Manager):
             daily_vocher = own_HoldingVocher.filter(
                 created__date=datetime.date.today()).first()
         except Exception as error:
-            testlog.error(error)
+            log.error(error)
             return HoldingVocher.objects.none()
 
         if daily_vocher:
@@ -72,14 +78,14 @@ class HoldingVocherManager(models.Manager):
                 available_vochers = Vocher.objects.exclude(
                     pk__in=unavailable_vocher_pk)
             except Exception as error:
-                testlog.error(error)
+                log.error(error)
                 undraw_vochers = []
 
             num_available_vochers = len(available_vochers)
             if num_available_vochers <= 0:
                 all_vochers = Vocher.objects.all()
                 if(len(all_vochers) != len(own_HoldingVocher)):
-                    testlog.warning(
+                    log.warning(
                         "Error because all vohcers are drawed, but amount not equal to all vochers")
 
                 # 都沒有剩餘有限額可以抽的優惠券，回傳空陣列
@@ -129,16 +135,16 @@ class HoldingVocherManager(models.Manager):
                         vocher=vocher, user=user)
                     daily_vocher.save()
                 except ValidationError as error:
-                    testlog.error(error)
+                    log.error(error)
                     return HoldingVocher.objects.none()
                 except Exception as error:
-                    testlog.warning(error)
+                    log.warning(error)
                     return HoldingVocher.objects.none()
                 else:
                     try:
                         Profile.objects.filter(user=user)[0].add_point(30)
                     except Exception as error:
-                        testlog.warning(error)
+                        log.warning(error)
                         return HoldingVocher.objects.none()
                     return [daily_vocher]
 
@@ -147,7 +153,7 @@ class HoldingVocherManager(models.Manager):
             daily_vocher = HoldingVocher.objects.filter(
                 user=user).filter(created__date=datetime.date.today())
         except Exception as error:
-            testlog.error(error)
+            log.error(error)
             return False
         if daily_vocher:
             return True
@@ -237,7 +243,7 @@ class HoldingVocher(models.Model):
         try:
             self.label = holdingVocher_label
         except Exception as error:
-            testlog.error(error)
+            log.error(error)
             holdingVocher_label = hash(hashkey**2) % (10 ** 20)
             holdingVocher_label = slugify(holdingVocher_label)
             self.label = holdingVocher_label
