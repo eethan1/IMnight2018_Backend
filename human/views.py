@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
@@ -76,8 +76,10 @@ class RelationshipDetailsView(ListAPIView):
         user = self.request.user
 
         try:
+            # sort by unread_msg_count while querying
             queryset = Relationship.objects.filter(
-                Q(client=user) | Q(performer=user))
+                Q(client=user) | Q(performer=user)).annotate(
+                unread_msg_count=Count('messages')).order_by('-unread_msg_count')
 
         except Exception as error:
             log.warning("query %s Relationship發生錯誤: %s" %
