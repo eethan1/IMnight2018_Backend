@@ -196,6 +196,8 @@ class Vocher(models.Model):
     category = models.PositiveSmallIntegerField(
         default=1, choices=VOCHER_LIMIT_CHOICE)
 
+    used_count = models.IntegerField(default=0)
+
     limit = models.IntegerField(
         default=0,
         blank=True,
@@ -233,6 +235,8 @@ class HoldingVocher(models.Model):
             raise Exception("A Vocher can't used twice")
         else:
             self.be_used = True
+            self.vocher.used_count = self.vocher.used_count + 1
+            self.vocher.save()
             self.save()
 
     def save(self, *args, **kwargs):
