@@ -53,4 +53,4 @@ class RelationshipSerializer(serializers.ModelSerializer):
 
     def get_unread_msg_count(self, obj):
         # Message Model的ForeignKey的related_name='messages'
-        return obj.messages.filter(readed=False).count()
+        return obj.messages.exclude(handle=self.context['request'].user).filter(readed=False).count()
