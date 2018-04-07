@@ -34,4 +34,4 @@ ALLOWED_HOSTS = ['testbackend.ntu.im',
                  'imnight2018backend.ntu.im']
 
 # Turn off DEBUG mode.
-# DEBUG = False
+DEBUG = False
